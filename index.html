@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<!-- gerüst der anwendung: nur der container <main id="app">, in den js/app.js hineinrendert, lädt genau eine datei (js/app.js), alles andere kommt über import-anweisungen -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>interaktive Lehreinheit</title>
+<script>
+/*
+darstellung: "dunkel" (standard) oder "hell", läuft vor dem ersten zeichnen, damit nichts aufblitzt, setzt data-theme am <html> (farben: :root[data-theme="light"] in css/01-grundlagen.css)
+window.darstellung nutzt das einstellungs-pop-up in js/app.js, gespeichert wird in localStorage, nicht im daten-export (einstellung des geräts)
+farbsicht: "normal" (standard) oder "rot-gruen" (deuteranopie und protanopie), unabhängig von hell/dunkel, setzt data-farbsicht am <html> (farben: :root[data-farbsicht="rot-gruen"] in css/01-grundlagen.css), wie die darstellung eine einstellung des geräts
+*/
+(function () {
+  var KEY = "app-darstellung";
+  function lesen() {
+    try { return localStorage.getItem(KEY) === "hell" ? "hell" : "dunkel"; }
+    catch (e) { return "dunkel"; }
+  }
+  function anwenden() {
+    document.documentElement.setAttribute("data-theme", lesen() === "hell" ? "light" : "dark");
+  }
+  anwenden();
+  window.darstellung = {
+    lesen: lesen,
+    setzen: function (m) {
+      try { localStorage.setItem(KEY, m === "hell" ? "hell" : "dunkel"); } catch (e) {}
+      anwenden();
+    }
+  };
+})();
+(function () {
+  var KEY = "app-farbsicht";
+  function lesen() {
+    try { return localStorage.getItem(KEY) === "rot-gruen" ? "rot-gruen" : "normal"; }
+    catch (e) { return "normal"; }
+  }
+  function anwenden() {
+    if (lesen() === "rot-gruen") document.documentElement.setAttribute("data-farbsicht", "rot-gruen");
+    else document.documentElement.removeAttribute("data-farbsicht");
+  }
+  anwenden();
+  window.farbsicht = {
+    lesen: lesen,
+    setzen: function (m) {
+      try { localStorage.setItem(KEY, m === "rot-gruen" ? "rot-gruen" : "normal"); } catch (e) {}
+      anwenden();
+    }
+  };
+})();
+</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <main id="app"></main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

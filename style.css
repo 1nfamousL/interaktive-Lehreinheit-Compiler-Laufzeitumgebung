@@ -1,0 +1,24 @@
+/* stylesheet: nur die reihenfolge der teile, der inhalt steht in css/ */
+@import "css/01-grundlagen.css";
+@import "css/02-basis.css";
+@import "css/03-menue.css";
+@import "css/04-kapitel-kopf.css";
+@import "css/05-mindmap.css";
+@import "css/06-kapitel-liste.css";
+@import "css/07-lektion.css";
+@import "css/08-abbildungen.css";
+@import "css/10-roboter.css";
+@import "css/11-phasen-geruest.css";
+@import "css/12-laufzeit.css";
+@import "css/13-drag-drop.css";
+@import "css/14-zuordnung.css";
+@import "css/15-lexik.css";
+@import "css/16-syntax.css";
+@import "css/17-semantik.css";
+@import "css/18-weg.css";
+@import "css/20-popups.css";
+@import "css/30-feinabstimmung.css";
+@import "css/31-symbole.css";
+@import "css/32-bewegung-fokus.css";
+@import "css/33-einstellungen.css";
+@import "css/99-helles-schema.css";

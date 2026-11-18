@@ -1,0 +1,110 @@
+/* ---- kapitelübersicht: eigene kopfzeile ---- */
+.screen-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+/* Kopfzeile der Kapitelübersicht bleibt oben stehen, während #app scrollt. Sie reicht per
+   negativem Rand bis an den Rahmen und deckt mit der oberen Verlaufsfarbe des Rahmens ab, was
+   darunter durchscrollt (der Verlauf von #app scrollt nicht mit, oben ist immer --app-oben). */
+.screen-head--sticky {
+  position: sticky;
+  top: calc(-1 * var(--pad-l));
+  z-index: 5;
+  margin: calc(-1 * var(--pad-l)) calc(-1 * var(--pad-l)) 0;
+  /* Graue Linie als Abgrenzung wie zwischen den Kapiteln, aber durchgehend von Rahmen zu Rahmen */
+  padding: var(--pad-l);
+  border-bottom: 1px solid var(--border);
+  /* Halbtransparent mit Weichzeichner: die Kapitel scheinen beim Scrollen verschwommen durch */
+  background: color-mix(in srgb, var(--app-oben) 70%, transparent);
+  -webkit-backdrop-filter: blur(10px);  /* Safari vor Version 18 */
+  backdrop-filter: blur(10px);
+}
+/* Ohne Weichzeichner wäre der durchscheinende Text hinter den Knöpfen unruhig: dann voll deckend */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .screen-head--sticky { background: var(--app-oben); }
+  /* doppelte Klasse, weil die eigentliche Regel weiter unten steht und sonst gewinnen würde */
+  .notes-panel.notes-panel { background: var(--panel); }
+}
+.head-actions { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+
+.btn {
+  font: inherit;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--r-m);
+  padding: 0.5625rem 1rem;
+  cursor: pointer;
+  transition: .15s;
+}
+.btn:hover { background: var(--panel-2); border-color: var(--border-hover); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.btn:disabled:hover { background: transparent; border-color: var(--border); }
+
+/* Hilfe-Button in der Kopfzeile: gleiche Schrift, Höhe (38px) und Radius wie
+   die Zurück-Buttons (.back) und der Icon-Button daneben. Die Textbox wird
+   wie bei .btn-label auf Versalhöhe zugeschnitten, die Höhe kommt deshalb
+   über min-height statt aus der Zeilenhöhe. */
+.head-actions .btn {
+  font-size: var(--fs-l);
+  font-weight: 500;
+  line-height: 1.2;
+  text-box: trim-both cap alphabetic;
+  min-height: 2.375rem;
+  border-radius: var(--r-m);
+}
+
+.icon-btn {
+  width: 2.375rem; height: 2.375rem;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--r-m);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: .15s;
+}
+.icon-btn:hover { background: var(--panel-2); color: var(--text); }
+.icon-btn svg { width: 1.25rem; height: 1.25rem; }
+.icon-btn.active { border-color: var(--accent-text); color: var(--accent-text); background: var(--panel-2); }
+
+/* ---- kapitelübersicht: umschalter liste/mindmap ---- */
+.view-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-l);
+  padding: 4px;
+  width: fit-content;
+  flex: none;
+}
+/* Schrift und Maße wie die Zurück-Buttons (.back), damit beide als Gruppe
+   wirken. Die Textbox wird wie bei .btn-label auf Versalhöhe zugeschnitten
+   (siehe dort), damit der Text im Tab optisch mittig sitzt. */
+.view-tab {
+  font: inherit;
+  font-size: var(--fs-l);
+  font-weight: 500;
+  line-height: 1.2;
+  text-box: trim-both cap alphabetic;
+  color: var(--text-dim);
+  background: transparent;
+  border: none;
+  border-radius: var(--r-m);
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: .15s;
+}
+.view-tab:hover { color: var(--text); background: var(--panel-2); }
+.view-tab[aria-selected="true"] { background: var(--panel-2); color: var(--text); box-shadow: inset 0 0 0 1px var(--border-hover); }
+
+.progress { display: flex; align-items: center; gap: 10px; flex: none; }
+/* text-box wie bei .btn-label: ohne Zuschnitt auf die Versalhöhe sitzt der
+   Balken sichtbar höher als die Mitte der Schrift. */
+.progress-label { color: var(--text-dim); font-size: var(--fs-l); font-weight: 500; text-box: trim-both cap alphabetic; }
+/* Ohne overflow: hidden, damit das Leuchten des Balkens nicht abgeschnitten wird (der Balken ist
+   selbst abgerundet und nie breiter als die Spur) */
+.progress-track { width: 11.875rem; height: 0.5rem; border-radius: 999px; background: var(--fortschritt-spur); }
+.progress-fill { height: 100%; border-radius: 999px; background: var(--fortschritt); box-shadow: 0 0 10px color-mix(in srgb, var(--fortschritt) 60%, transparent); }
+.progress-value { color: var(--text-dim); font-size: var(--fs-l); font-weight: 500; text-box: trim-both cap alphabetic; }
+

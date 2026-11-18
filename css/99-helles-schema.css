@@ -1,0 +1,31 @@
+/* ---- korrekturen nur für das helle schema ---- */
+/* Nur was sich nicht als Farbrolle ausdrücken lässt. Die Farben selbst stehen im hellen Block oben. */
+/* Aktueller Knoten und ausgewähltes Token/Nichtterminal mit weißem Abstand und kräftigem blauem Ring */
+:root[data-theme="light"] .sem-knoten.cur,
+:root[data-theme="light"] .sem-curbox:not(.fin):not(.bad),
+:root[data-theme="light"] .pb-chip.sel,
+:root[data-theme="light"] .pb-tok.sel {
+  border-color: var(--accent-text);
+  box-shadow: 0 0 0 2px var(--weiss), 0 0 0 5px var(--accent);
+}
+:root[data-theme="light"] .sem-knoten.cur,
+:root[data-theme="light"] .sem-curbox:not(.fin):not(.bad) { background: var(--weiss); }
+/* Leuchten wirkt nur auf Dunkel. Auf Hell ist es aus, der Rahmen #app bekommt stattdessen einen
+   dunklen Rand und einen weichen Schatten. */
+:root[data-theme="light"] #app {
+  border-color: var(--blau-8);
+  box-shadow: 0 8px 22px -10px color-mix(in srgb, var(--schatten) 55%, transparent);
+}
+:root[data-theme="light"] .progress-fill { box-shadow: none; }/* Abgeschlossene Lektionskarte auf Hell: Rand in voller Farbe, ohne Leuchten (2px wie alle Karten) */
+:root[data-theme="light"] .lesson-card.done,
+:root[data-theme="light"] .mini-karte.done {
+  border-color: var(--abgeschlossen);
+  box-shadow: none;
+}
+:root[data-theme="light"] .lesson-card.done:hover {
+  box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--schatten) 70%, transparent);
+}
+/* Angefangen auf Hell: Rand in voller Farbe statt 40 % (Breite und Abstand wie auf Dunkel) */
+:root[data-theme="light"] .lesson-card.angefangen,
+:root[data-theme="light"] .mini-karte.angefangen { border-color: var(--abgeschlossen); }
+:root[data-theme="light"] .mt-pfeil { filter: none; }

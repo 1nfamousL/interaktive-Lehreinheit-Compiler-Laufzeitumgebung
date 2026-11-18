@@ -1,0 +1,50 @@
+/* ---- bewegung und fokus ---- */
+/* Kurze Übergänge (150–250 ms, ease-out), animiert werden nur opacity und transform. In den
+   Übungen selbst (Ziehen, Färben, Ablegen) gibt es bewusst keine zusätzlichen Animationen. */
+
+/* Tastaturfokus: einheitlicher Ring im Akzent-Blau, nur bei Bedienung mit der Tastatur
+   (:focus-visible). Eingabefelder behalten ihren eigenen Fokus über die Rahmenfarbe. */
+:where(button, a, summary, select, [role="button"], [tabindex]):focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 2px;
+}
+
+/* Knöpfe geben beim Klicken kurz nach. Nicht bei ziehbaren Elementen (Bausteine, Chips,
+   Token), dort würde es das Ziehen stören. */
+:is(.btn, .primary, .secondary, .menu-btn, .icon-btn, .back, .view-tab,
+    .robot-check-btn, .robot-btn-reset, .lex-btn-check, .lex-btn-reset,
+    .pb-btn-regeln, .sem-fehlerknopf):not(:disabled):active {
+  transform: scale(.97);
+}
+
+/* Lektionskarten heben sich beim Darüberfahren leicht an */
+.lesson-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--schatten) 70%, transparent); }
+/* Abgeschlossene Karte behält beim Hover ihr Leuchten, der Schatten kommt dazu */
+.lesson-card.done:hover {
+  box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--schatten) 70%, transparent),
+    0 0 12px color-mix(in srgb, var(--abgeschlossen) 15%, transparent), inset 0 0 10px color-mix(in srgb, var(--abgeschlossen) 6%, transparent);
+}
+
+/* Pop-ups (Hilfe, Info, Einstellungen, Syntax- und Semantikregeln): Hintergrund blendet ein,
+   das Fenster wächst leicht. Schließen bleibt sofort. */
+@keyframes popup-hintergrund { from { opacity: 0; } }
+@keyframes popup-fenster { from { opacity: 0; transform: scale(.96); } }
+.modal-backdrop { animation: popup-hintergrund .18s ease-out; }
+.modal-backdrop > .modal { animation: popup-fenster .2s ease-out; }
+
+/* Folienwechsel: die neue Folie blendet ein. Nur Deckkraft, keine Verschiebung: Mehrere Übungen
+   messen beim Aufbau Positionen und Höhen (Baumlinien, Programmspeicher), eine laufende
+   Verschiebung würde diese Messung verfälschen. */
+@keyframes folie-ein { from { opacity: 0; } }
+.slide { animation: folie-ein .2s ease-out; }
+
+/* "Bewegung reduzieren" im Betriebssystem: alle Animationen und Übergänge praktisch aus */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+

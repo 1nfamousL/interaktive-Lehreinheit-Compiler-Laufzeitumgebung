@@ -1,0 +1,153 @@
+/* ---- folien einer lektion ---- */
+/* ---- navigation unter der folie ---- */
+/* Kein eigenes margin-bottom hier: der Abstand nach unten kommt allein
+   vom "gap" des #app-Flex-Containers, sonst addieren sich beide (Margins
+   kollabieren nicht zwischen Flex-Items) und der Slide-Bereich darunter
+   bekommt unnötig weniger Platz. */
+/* Drei Spalten: Zurück-Pfeil links, Folienpunkte in der Mitte, Weiter-Pfeil
+   rechts. Die äußeren Spalten sind gleich breit (1fr), dadurch bleibt die
+   Mitte unabhängig von der Folienzahl zentriert und die Pfeile bleiben an
+   festen Positionen. */
+.slide-nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; flex: none; }
+.slide-prev { justify-self: start; }
+.slide-next { justify-self: end; }
+/* Maße wie .back (Menü/Kapitel), nur mit gespiegeltem Padding beim
+   Weiter-Button, weil dort das Icon rechts steht. */
+.slide-prev, .slide-next {
+  font-size: var(--fs-l); font-weight: 500; line-height: 1.2;
+  display: inline-flex; align-items: center; gap: 6px;
+  border-radius: var(--r-m);
+}
+.slide-prev { padding: 9px 16px 9px 12px; }
+.slide-next { padding: 9px 12px 9px 16px; }
+.slide-dots { display: flex; align-items: center; gap: 8px; }
+.slide-connector { height: 2px; width: 1.5rem; flex: none; background: var(--verbinder); border-radius: var(--r-s); }
+/* Schrift wie die Buttons in der Kopfzeile. Ein <button> erbt die Schrift
+   nicht, daher "font: inherit". Die Textbox wird wie bei .btn-label auf
+   Versalhöhe zugeschnitten, damit die Ziffern optisch mittig im Kreis sitzen. */
+.slide-dot {
+  width: 2.125rem; height: 2.125rem;
+  padding: 0;
+  font: inherit;
+  font-size: var(--fs-l);
+  font-weight: 500;
+  line-height: 1.2;
+  text-box: trim-both cap alphabetic;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: .15s;
+}
+/* Aktuelle Folie: Ring bleibt im Zustand der Folie (grau, gestrichelt, erledigt), stattdessen gefüllt
+   wie ein Button beim Überfahren (--panel-2, auf Hell fast weiß) und die Zahl in voller Schriftfarbe */
+.slide-dot.active, .mini-punkt.active { background: var(--panel-2); color: var(--text); }
+.slide-dot:hover { color: var(--text); }
+/* Zustände (setzt dotZustand() in app.js), wie bei den Lektionskarten: grau = noch nicht gesehen,
+   gestrichelt = Übung noch nicht gelöst, Ring in --abgeschlossen = erledigt (gesehen und, falls
+   Übung, gelöst). Nur der Ring wird gefärbt, die Zahl behält ihre Farbe. Die aktuelle Folie
+   behält ihren eigenen Ring. Die Mini-Punkte in der Lektionshilfe (lektionBedienungHtml() in
+   app.js) hängen an denselben Regeln. */
+.slide-dot.uebung, .mini-punkt.uebung { border-style: dashed; }
+.slide-dot.erledigt, .mini-punkt.erledigt { border-color: var(--abgeschlossen); }
+
+/* ---- folienfläche und folienbreite ---- */
+/* Die Folie füllt die Höhe (align-items: stretch, der Flexbox-Standard).
+   "flex: 1" hier nimmt genau den Platz ein, der unter der Kopfzeile übrig
+   bleibt, "min-height: 0" ist nötig, damit die Folie darin überhaupt
+   eigenständig scrollen kann, statt den Rahmen aufzudrücken (typische
+   Flexbox-Falle). position: relative ist der Bezug für das schwebende
+   Kommentar-Panel (.notes-panel). */
+.lesson-body { display: flex; gap: 20px; flex: 1; min-height: 0; position: relative; }
+.lesson-body .slide { flex: 1; min-width: 0; }
+/* Standard: Die Folie ist nur so breit wie ihr Inhalt (mindestens 700px) und steht mittig, damit
+   der Text im Fokus liegt. Die Breite kommt aus dem Inhalt: Absätze sind über .slide-lesbar auf
+   100ch begrenzt, Abbildungen und Übungen haben eigene Breiten. Ist das Fenster schmaler, gibt die
+   Folie nach (flex-shrink). Übungen, die mit dem Fenster wachsen sollen (Bäume, Seitenleisten,
+   Sandbox), melden das mit meldeBreite() (js/uebung.js), app.js setzt dann .slide--voll. */
+.lesson-body .slide { flex: 0 1 auto; min-width: min(43.75rem, 100%); margin-inline: auto; }
+.lesson-body .slide.slide--voll { flex: 1; margin-inline: 0; }
+
+.slide {
+  background: var(--panel);
+  border: 2px solid var(--border);  /* 2px wie die Lektionskarten */
+  border-radius: var(--r-xl);
+  padding: var(--pad-xl);
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.slide h2 { font-size: var(--fs-xl); font-weight: 700; width: 100%; margin: 0; }
+
+/* ---- kommentar-panel ---- */
+.notes-panel {
+  /* Schwebt oben rechts über der Folie, direkt unter dem Kommentar-Knopf der Kopfzeile.
+     Die Folie behält so ihre volle Breite (viele Übungen haben feste Pixelbreiten).
+     z-index über den Ebenen innerhalb der Übungen (bis 30), unter den Pop-ups (1000). */
+  position: absolute; top: var(--gap-m); right: var(--gap-m); z-index: 40;
+  width: min(22.5rem, calc(100% - 2 * var(--gap-m)));
+  max-height: calc(100% - 2 * var(--gap-m));
+  box-sizing: border-box;
+  /* Milchglas wie die Kopfzeile der Kapitelübersicht: die Folie scheint verschwommen durch.
+     Das Textfeld darin bleibt deckend, damit sich der Kommentar gut lesen lässt. */
+  background: color-mix(in srgb, var(--panel) 70%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: var(--r-l);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--schatten) 45%, transparent);
+  padding: var(--pad-l);
+  display: flex;
+  flex-direction: column;
+  gap: var(--abstand-titel);
+}
+.notes-panel h3 { margin: 0; flex: none; font-size: var(--fs-l); font-weight: 600; color: var(--text); }
+/* X oben rechts wie in den Meldungen (.msg-x) */
+.notes-panel .msg-x { top: 6px; right: 6px; }
+.notes-panel textarea {
+  font: inherit;
+  font-size: var(--fs-l);
+  /* Höhe aus rows="7"; der Nutzer kann es nach unten aufziehen, höchstens bis das Panel
+     die Folie ausfüllt (max-height oben) */
+  min-height: 0;
+  resize: vertical;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-m);
+  padding: 10px 12px;
+  color: var(--text);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.notes-panel textarea::placeholder { color: var(--text-dim); }
+.notes-panel textarea:focus { outline: none; border-color: var(--accent-text); }
+
+/* ---- text auf der folie ---- */
+.slide-copy { flex: 1; min-width: 16.25rem; }
+.slide-copy p { line-height: 1.75; font-size: var(--fs-l); max-width: 80ch; margin: 0 0 16px; }
+.slide-copy p:last-child { margin-bottom: 0; }
+/* Mehrzeiliger Code/Text-Baum in einer Textfolie: Zeilenumbrüche und
+   Einrückung bleiben erhalten (in <p> ist <pre> nicht erlaubt). */
+.slide-code { display: block; white-space: pre; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: var(--fs-l); line-height: 1.5; }
+/* Code-Schrift im Fließtext: Adressen, Bits und Befehle der menschenlesbaren Sprache */
+.code-text { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .95em; }
+/* Quellcode der Hochsprache im Lektionstext: dunkel auf Papier wie in den Lexik- und
+   Codegenerierungsübungen (.lex-code, .cg-source). Inline im Satz; mit .slide-code als Block. */
+.code-papier {
+  background: var(--quelltext-bg);
+  color: var(--quelltext-text);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: .95em;
+  padding: 1px 8px;
+  border-radius: var(--r-s);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+/* Token im Lektionstext (Lexik, Kapitel 2): Farbe der Kategorie über .lex-mark-* wie in der Übung */
+.token-marke { display: inline-block; padding: 1px 8px; margin-block: 2px; border-radius: var(--r-s); font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; font-size: .95em; line-height: 1.5; }
+.code-papier.slide-code { width: fit-content; padding: 12px 16px; border-radius: var(--r-m); font-size: var(--fs-l); }
+

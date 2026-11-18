@@ -1,0 +1,105 @@
+/* ---- basis: zurücksetzen, schriftgröße und mindestbreite ---- */
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; height: 100%; }
+/* Basis für alle rem-Werte. Größen (Breiten, Höhen, Schrift) stehen in rem und
+   wachsen mit der Fensterbreite: 1440px Fenster = 16px Grundschrift (Faktor 1).
+   Abstände (padding, margin, gap), Radien, Schatten und Linien bleiben px. */
+html { font-size: clamp(10px, calc(6.32px + 0.672vw), 32px); }
+/* Mindestbreite: darunter wird seitlich gescrollt, statt das Layout weiter zu stauchen. */
+html { overflow-x: auto; }
+body { min-width: 67.8125rem; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 100%;
+}
+
+/* ---- kopfzeile eines screens ---- */
+/* Jeder Screen mit eigener Kopfzeile (Kapitelübersicht, Lektion) baut sie
+   selbst mit dieser Klasse, siehe renderChapters()/renderLesson() in
+   js/app.js. Keine globale Leiste mehr außerhalb von #app. */
+.screen-head h1 { font-size: var(--fs-xl); font-weight: 700; margin: 0; }
+/* Lektion: Nummer, Lektionstitel (blau) und Folientitel in einer Zeile, damit die Knöpfe rechts
+   nicht verrutschen. Die Nummer bleibt immer stehen. Der Rest (.lesson-head-rest) ist eine
+   umbrechende Flex-Zeile, die genau eine Zeile hoch ist und den Überlauf abschneidet. Mit
+   row-reverse + order kommt der Folientitel zuerst in die Zeile, dann der Trenner, zuletzt der
+   Titeltext: Fehlt der Platz, bricht der Titeltext in die abgeschnittene zweite Zeile um und
+   verschwindet ganz. Ist der Folientitel allein zu lang, wird er mit "…" gekürzt. */
+.screen-head h1.lesson-head-title { flex: 1 1 0; min-width: 0; display: flex; align-items: flex-start; gap: .5em; line-height: 1.3; white-space: nowrap; }
+.lesson-head-nr { flex: none; color: var(--kapitelnummer); font-weight: 700; }
+.lesson-head-rest {
+  flex: 1 1 0;
+  min-width: 0;
+  /* 1.5em hoch, damit Unterlängen (g, p, y) nicht abgeschnitten werden. Der negative Rand holt die
+     Höhe wieder auf die 1.3em der Kopfzeile zurück, die Nummer links bleibt auf derselben Linie. */
+  line-height: 1.5;
+  height: 1.5em;
+  margin: -.1em 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row-reverse;
+  flex-wrap: wrap;
+  justify-content: flex-end; /* bei row-reverse: Rest links an der Nummer */
+  align-content: flex-start;
+}
+.lesson-head-lektion { order: 3; color: var(--kapitelnummer); font-weight: 700; }
+.lesson-head-trenner { order: 2; color: var(--text-dim); font-weight: 400; margin: 0 .5em; }
+.lesson-head-folie { order: 1; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+
+.back {
+  font: inherit;
+  font-size: var(--fs-l);
+  font-weight: 500;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--r-m);
+  /* links weniger, weil das Icon (18px-Box) eigenen Leerraum mitbringt */
+  padding: 9px 16px 9px 12px;
+  cursor: pointer;
+  transition: .15s;
+}
+.back:hover { background: var(--panel-2); color: var(--text); }
+/* Pfeil in Zurück-/Weiter-Buttons: 18x18-Box mit 1:1-viewBox (siehe
+   CHEVRON_LEFT/CHEVRON_RIGHT in js/app.js), der Pfeil selbst ist darin ca.
+   10px hoch, also etwa Versalhöhe der 17px-Schrift. Strichstärke 2 = 2px,
+   weil der viewBox-Maßstab 1 ist. */
+.chevron { width: 1.125rem; height: 1.125rem; stroke-width: 2; flex: none; display: block; }
+
+/* Beschriftung neben dem Pfeil: die Textbox wird oben auf die Versalhöhe und
+   unten auf die Grundlinie zugeschnitten, sonst sitzt der Text (wegen Raum
+   für Ober-/Unterlängen) optisch tiefer als das mittig gesetzte Icon.
+   "text-box" kennt Chrome ab Version 133, in älteren Browsern bleibt es
+   beim bisherigen Verhalten. */
+.btn-label { text-box: trim-both cap alphabetic; }
+
+h2 { font-size: var(--fs-l); margin: 0 0 12px; }
+h3 { font-size: var(--fs-m); margin: 0 0 6px; }
+
+/* ---- rahmen um den screen ---- */
+#app {
+  flex: 1;
+  min-height: 0;
+  border: 2px solid var(--accent);
+  border-radius: var(--r-xl);
+  /* Leichtes Leuchten des blauen Rahmens nach außen und innen */
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 45%, transparent), inset 0 0 10px color-mix(in srgb, var(--accent) 18%, transparent);
+  background: linear-gradient(180deg, var(--app-oben), var(--bg-verlauf));
+  padding: var(--pad-l);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+}
+

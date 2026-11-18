@@ -1,0 +1,87 @@
+/* ---- laufzeit mit fächern (compiler-weg-laufzeit-faecher.js) ---- */
+/* Laufzeitsystem (js/exercises/compiler-weg-laufzeit-faecher.js, entstanden aus laufzeitsystem.js): dieselbe
+   Maschine wie in 2.5, jetzt mit Werten. Baut auf den Roboter- und
+   Codegenerierungs-Styles oben auf (Programmspeicher, Bausteinfarben,
+   Speicherzellen, Raster, Phasen-Chips aus 1.2). Lesen leuchtet blau,
+   Schreiben gelb wie .memory-byte.highlight. */
+.lz-prog { flex: none; width: 23.75rem; min-width: 0; max-width: none; }
+.lz-row { position: relative; gap: 6px; }
+.lz-row .robot-lineno { min-width: 0; }
+/* Pfeil liegt komplett im Innenabstand, damit die Zeilennummern bündig mit
+   der Überschrift beginnen (-(Breite + gap)). */
+.lz-pc { width: 0.625rem; flex: none; margin-left: -16px; color: var(--accent-text); font-size: var(--fs-xs); visibility: hidden; }
+.lz-row.robot-ue-active .lz-pc { visibility: visible; }
+.lz-row .robot-mslot { min-height: 2.75rem; }
+.lz-jump-label { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: var(--fs-s); font-weight: 700; color: var(--weiss); background: var(--befehl-sprung-symbol); border-radius: var(--r-s); padding: 3px 7px; pointer-events: none; }
+.lz-jump-label:empty { display: none; }
+.lz-row.lz-jump-target .robot-mblock-placed { box-shadow: 0 0 0 3px var(--markierung-sprung); }
+.lz-row.lz-error .robot-mblock-placed, .lz-row.lz-error .robot-mslot { box-shadow: 0 0 0 3px var(--fehler-stark); }
+
+.lz-mid { width: 20rem; flex: none; display: flex; flex-direction: column; gap: 16px; }
+.lz-cpu-grid { display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; align-items: center; margin: 0 2px 14px; }
+.lz-cpu-key { font-size: var(--fs-s); color: var(--text-dim); }
+.lz-cpu-val { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: var(--fs-m); font-weight: 700; background: var(--feld); border: 1px solid var(--feld-rand); border-radius: var(--r-s); padding: 6px 10px; min-height: 2rem; }
+.lz-phases { display: flex; align-items: center; gap: 6px; font-size: var(--fs-s); font-weight: 700; flex-wrap: wrap; }
+.lz-phases .robot-ue-phase { padding: 0.3125rem 0.625rem; }
+/* Kapitel 6: die Phasen stehen immer in einer Zeile, die CPU-Spalte ist so breit wie diese Zeile
+   (min-content), mindestens aber 320px. Der Meldungstext darunter bricht weiter um. */
+.cw-app .lz-phases { flex-wrap: nowrap; }
+.cw-app .lz-mid { width: min-content; min-width: 20rem; }
+/* Das Programmspeicher-Fenster ist so hoch wie sein Inhalt und wird nicht auf die Höhe der
+   anderen Spalten gestreckt */
+.cw-app .lz-prog { align-self: flex-start; }
+.lz-alu { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: var(--fs-m); font-weight: 700; background: var(--feld); border: 1px solid var(--feld-rand); border-radius: var(--r-s); padding: 8px 10px; }
+.lz-msg { min-height: 2.625rem; margin-top: 12px; }
+
+.cg-mem-cell.lz-reg { min-height: 3rem; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4px 0; }
+.lz-reg .cg-mem-addr { font-size: var(--fs-s); font-weight: 700; padding-bottom: 2px; }
+.cg-mem-cell.lz-flag { flex: 0 0 calc(50% - 5px); }
+.lz-val { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: var(--fs-l); font-weight: 700; color: var(--text); }
+.lz-mem-note { margin-top: 10px; }
+.cg-mem-cell.lz-read { background: color-mix(in srgb, var(--accent) 35%, transparent); border-color: var(--accent-text); }
+.cg-mem-cell.lz-write { background: var(--markierung-schreiben); border-color: var(--markierung-schreiben); }
+.cg-mem-cell.lz-write .cg-mem-addr, .cg-mem-cell.lz-write .lz-val{ color: var(--text-auf-farbe); }
+
+/* Laufzeit mit Fächern (compiler-weg-laufzeit-faecher.js): nach dem Laden sind alle Fächer neutral
+   (Befehle, Zahlen, Register, Adressen), die Adresse steht im Fach (.lz-adr-im-fach). Der Pfeil steht
+   am Befehlszähler, das gerade gelesene Fach leuchtet. Die Fächer erscheinen nacheinander. */
+/* Adressfelder (Fach im Datenspeicher, Befehlszähler): feste quadratische Größe. Im Datenspeicher steht die
+   Adresse immer an derselben Stelle oben, der Wert darunter (auch wenn das Fach noch leer ist). */
+.lz-mid { --lz-feld: 3.25rem; }
+.lz-datengrid { grid-template-columns: repeat(5, var(--lz-feld)); }
+.cg-mem-cell.lz-feld { width: var(--lz-feld); height: var(--lz-feld); padding: 6px 0 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+.lz-feld .cg-mem-addr { padding-bottom: 2px; }
+.lz-cpu-val.lz-adr-box { width: var(--lz-feld); height: var(--lz-feld); padding: 0; display: flex; align-items: center; justify-content: center; }
+.lz-row.lz-pcrow .lz-pc { visibility: visible; }
+.lz-row.lz-lesen .robot-mblock-placed { box-shadow: 0 0 0 3px var(--markierung-lesen); }
+.robot-mblock-placed.lz-fach { background: var(--feld); border: 1px solid var(--feld-rand); color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight: 700; font-size: var(--fs-m); }
+/* Adresse im Fach selbst (Lektion 1-2, Folie 6): klein und grau vor dem Inhalt, der wie sonst in
+   .lz-fach weiß und fett steht. */
+.lz-adr-im-fach { flex: none; min-width: 2.375rem; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: var(--fs-s); font-weight: 500; color: var(--text-dim); }
+/* Kapitel 1: dieselbe Stärke für die Adressen der Datenspeicher-Zellen und der Bytezellen */
+:is(.modell-speicher, .modell-cpu-spalte) .cg-mem-addr, .memory-box--fach .memory-addr { font-weight: 500; }
+/* Fach, in dem eine Adresse steht: grau wie .cg-mem-addr im Datenspeicher (nur der Wert ist hell) */
+.robot-mblock-placed.lz-fach.lz-fach-adr, .lz-fach-inline.lz-fach-adr { color: var(--text-dim); }
+.lz-fach-neu { animation: lz-fach-ein .35s ease both; }
+@keyframes lz-fach-ein { from { opacity: 0; transform: translateX(-14px) scale(.92); } to { opacity: 1; transform: none; } }
+.lz-right { flex: none; display: flex; flex-direction: column; gap: 16px; max-width: 26.25rem; }
+
+/* Steuerleiste unter dem Raster: oben das Tempo über die volle Breite,
+   darunter zwei Button-Zeilen (.robot-actions, Buttons gleich breit) */
+.lz-controls { display: flex; flex-direction: column; gap: 12px; }
+.lz-controls button { flex: 1 1 0; min-width: 0; }
+.robot-btn-reset:disabled { opacity: .5; cursor: not-allowed; }
+/* Laufzeit in Kapitel 5 und 6 ("Einzelschritt") und Roboter-Übung 1.1 ("Zurücksetzen"):
+   Hover wie bei .btn (Hilfe, nächste Lektion …) */
+.cw-app .lz-controls .robot-btn-reset:hover:not(:disabled), .robot-programm .robot-btn-reset:hover:not(:disabled) { background: var(--panel-2); border-color: var(--border-hover); }
+/* Pfeil selbst gezeichnet (appearance: none), weil sich der Pfeil des nativen
+   <select> nicht vom Rand wegschieben lässt */
+.lz-speed {
+  font: inherit; font-size: var(--fs-m); padding: 12px 40px 12px 12px; border-radius: var(--r-m); color: var(--text); border: 1px solid var(--border); cursor: pointer;
+  appearance: none; -webkit-appearance: none;
+  background-color: var(--panel-2);
+  background-image: var(--lz-pfeil);
+  background-repeat: no-repeat;
+  background-position: right 18px center;
+}
+

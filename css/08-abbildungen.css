@@ -1,0 +1,167 @@
+/* ---- abbildungen und karten in textfolien ---- */
+/* Übersetzung als Prozess (Lektion 1-2, Compiler-Folie): Quellcode → Compiler → Maschinencode.
+   Erste Zeile die Titel, zweite Zeile die Inhalte; Pfeile und Compiler-Quadrat stehen
+   mittig zu den Inhalten. width: fit-content wie bei .memory-box, sonst streckt das Grid
+   als Flex-Kind von .slide-centered auf die volle Breite. */
+.fluss { display: grid; grid-template-columns: repeat(5, auto); column-gap: 24px; row-gap: 10px; align-items: center; width: fit-content; }
+.fluss-pfeil { font-size: 2rem; line-height: 1; color: var(--text-dim); }
+/* Sprache ohne Rahmen (1-3, Compiler-Folie): Rolle klein und grau, darunter der Name der Sprache */
+.fluss-sprache { display: flex; flex-direction: column; gap: 4px; }
+.fluss-rolle { font-size: var(--fs-l); font-weight: 600; color: var(--text-dim); }
+.fluss-name { font-size: var(--fs-l); font-weight: 600; }
+/* Rahmen um eine Station des Ablaufs (1-3, Compiler-Folie) */
+.fluss-rahmen { border: 2px solid var(--text); border-radius: var(--r-l); padding: 14px 18px; }
+/* Ablauf-Folie (1-3): vier Kästen mit Pfeilen in einer Zeile. Der Kasten wächst mit dem
+   Wort mit (Maschinencode ist breiter als 120px). */
+.fluss-kurz { grid-template-columns: repeat(7, auto); }
+/* Gegenüberstellung in zwei Karten nebeneinander (1-3, Maschinennah oder High-Level) */
+.vergleich { display: flex; gap: var(--gap-l); flex-wrap: wrap; }
+.vergleich > .robot-card h2 { margin: 0 0 var(--abstand-titel); }
+.vergleich > .robot-card { flex: 1; min-width: 16.25rem; }
+/* Eine Karte mit zwei Teilen und einer Trennlinie dazwischen (Lektion 1.3, Folie 4) */
+.robot-card--geteilt { display: flex; }
+.robot-card-teil { flex: 1; min-width: 0; }
+/* Titel so groß wie der Text (.robot-card h2 steht weiter unten, daher die doppelte Klasse) */
+.robot-card.robot-card--geteilt h2 { font-size: var(--fs-l); }
+.robot-card-teil h2:not(:first-child) { margin-top: var(--gap-l); }
+.robot-card-teil + .robot-card-teil { margin-left: var(--gap-l); padding-left: var(--gap-l); border-left: 1px solid var(--border); }
+/* Teile untereinander statt nebeneinander, die Trennlinie liegt dann waagerecht dazwischen (Lektion 2.3, Folie 4) */
+.robot-card--stapel { flex-direction: column; }
+.robot-card--stapel > .robot-card-teil + .robot-card-teil { margin-left: 0; padding-left: 0; border-left: 0; margin-top: var(--gap-l); padding-top: var(--gap-l); border-top: 1px solid var(--border); }
+/* Text in den Karten auf etwa 50 Zeichen pro Zeile begrenzt (Lektion 1.3, Folien 4 bis 6) */
+/* .vergleich doppelt, damit die Regel gegen .slide-centered.slide-lesbar p (100ch, weiter unten) gewinnt */
+.vergleich.vergleich--schmal .robot-card :is(li, p) { max-width: 50ch; }
+/* Eine Spalte aus Karten als Teil eines Vergleichs (Lektion 1.3, Roboter), so breit wie eine Karte daneben */
+.vergleich > .vergleich { flex: 1; min-width: 16.25rem; }
+/* Codezeile mit farbigem Balken links, in der Farbe des zugehörigen Maschinenbefehls
+   (Lektion 1-2, Gegenüberstellung Quellcode / Maschinencode). Farben wie .cg-xfer,
+   .cg-move und .cg-halt. */
+.zeile { display: block; border-left: 4px solid var(--border); padding: 1px 0 1px 10px; margin: 3px 0; }
+
+.slide-figure { width: 16.25rem; flex: none; }
+.slide-figure svg, .slide-figure img { width: 100%; height: auto; display: block; border-radius: var(--r-m); }
+
+/* Für Folien mit eigener render-Funktion, die ihren Inhalt (Text +
+   Abbildung) zentriert stapeln wollen, statt in der generischen
+   Nebeneinander-Anordnung von .slide-copy/.slide-figure. */
+/* "centered" bezieht sich auf die Anordnung (Text/Abbildung/Text
+   gestapelt statt nebeneinander), nicht auf Textausrichtung: Absätze
+   bleiben linksbündig und nehmen die volle Breite ein (align-items:
+   normal = stretch), nur die Abbildung wird als einziges schmaleres
+   Element eigens zentriert (siehe .slide-centered .slide-figure unten). */
+.slide-centered { display: flex; flex-direction: column; width: 100%; gap: var(--gap-l); }
+/* Bewusst kein max-width hier (anders als .slide-copy p): der Absatz soll
+   sich so weit ausbreiten, wie Platz da ist, und erst umbrechen, wenn der
+   verfügbare Platz schmaler als der Text selbst wird, statt schon vorher
+   künstlich an einer Zeichenbreite zu brechen. */
+.slide-centered p { line-height: 1.75; font-size: var(--fs-l); margin: 0; }
+/* Optional (Zusatzklasse): feste Zeilenbreite für Absätze, damit der Umbruch nicht von der
+   Fensterbreite abhängt und man keine <br> von Hand setzen muss. Bisher nur Lektion 1-1. */
+.slide-centered.slide-lesbar p { max-width: 100ch; }
+/* Liste um den Einzug (22px) breiter, damit der Text gleich lang wird wie bei den Absätzen */
+.slide-centered.slide-lesbar :is(ul, ol) { max-width: calc(100ch + 22px); }
+.slide-centered :is(ul, ol) { margin: 0; padding-left: 22px; }
+.slide-centered li { line-height: 1.75; font-size: var(--fs-l); }
+
+/* Kleine, echte Inline-SVGs (Kreis/Quadrat mit Beschriftung), um ein
+   einzelnes Wort mitten im Satz visuell hervorzuheben (siehe Folie
+   "Grundmodell eines Programms" in data/lektionen/1-1.js), statt dafür
+   eine separate Abbildung unterhalb des Textes zu brauchen. */
+.inline-shape-svg { width: 4.5rem; height: 4.5rem; vertical-align: middle; margin: -6px 2px; }
+/* "Machen mit Sachen" (1.1, Folie 1): 260 x 190 Einheiten der viewBox, die Schrift im SVG
+   (font-size 17) wächst über die Breite mit, daher rem für die Breite, Höhe folgt der viewBox. */
+.machen-sachen-svg { width: 16.25rem; height: auto; }
+
+/* CPU-Ablauf-Diagramm (Folie "Machen - Ablauf, Bearbeiten" in
+   data/lektionen/1-1.js): Kreis und Pfeil bleiben eigene kleine SVGs
+   (die gebogene Pfeilform geht nur als Vektor-Pfad), der Text dazwischen
+   ist normales HTML. Alle drei Elemente werden über .cpu-loop als
+   Flexbox angeordnet statt über SVG-Koordinaten. */
+/* width: fit-content aus demselben Grund wie bei .memory-box oben:
+   sonst würde .cpu-loop als Flex-Kind von .slide-centered (align-items:
+   normal = stretch) auf die volle Zeilenbreite gestreckt, und
+   justify-content: space-between würde die drei Elemente je nach
+   Fensterbreite beliebig weit auseinanderziehen statt einen festen,
+   bewusst gewählten Abstand (gap) zu haben. */
+.cpu-loop {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  gap: 32px;
+  border: 2px solid var(--linie-grafik);
+  border-radius: var(--r-m);
+  padding: 20px 28px;
+}
+.cpu-loop svg { flex: none; }
+.cpu-loop-cpu { width: 6.875rem; height: 6.875rem; }
+.cpu-loop-arrow { width: 4.375rem; height: 5.5rem; }
+.cpu-loop-steps { display: flex; flex-direction: column; justify-content: center; gap: 16px; }
+.cpu-loop-steps p { font-weight: 600; }
+
+/* Speicher-/Adressdiagramm: eckig umrandete Box mit Byte-Gruppen und
+   optional darunter der Adresse je Byte, wiederverwendbar (siehe Folien
+   "Aufteilung des Speichers" und "Speicherinhalt adressieren" in
+   data/lektionen/1-1.js). Bewusst kein border-radius: eckig, nicht
+   rund. */
+/* width: fit-content, weil .memory-box sonst als Flex-Kind von
+   .slide-centered (align-items: normal = stretch) auf die volle
+   Zeilenbreite gestreckt würde, statt sich an den Inhalt anzupassen. */
+.memory-box { display: inline-flex; width: fit-content; gap: 20px; border: 2px solid var(--text); padding: 14px 22px; }
+.memory-col { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.memory-byte { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: var(--fs-m); font-weight: 600; padding: 1px 4px; border-radius: var(--r-s); }
+.memory-byte.highlight { background: var(--markierung-schreiben); color: var(--text-auf-farbe); }
+.memory-addr { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: var(--fs-m); color: var(--text-dim); }
+/* Durchgehender Speicher wie der Datenspeicher der Übungen (.cg-mem-cell): Rahmen und Füllung
+   von --feld-rand/--fach, die Adresse oben (klein, grau), der Wert darunter. Die Fächer sind
+   durch gerade Linien getrennt, nur der äußere Rahmen ist abgerundet (overflow: hidden schneidet
+   die Füllung der markierten Zelle an den Ecken ab). Ein beschriebenes Fach (.highlight) füllt
+   die ganze Zelle wie .lz-write. */
+.memory-box--fach { gap: 0; padding: 0; border: 1px solid var(--feld-rand); border-radius: var(--r-s); background: var(--fach); overflow: hidden; }
+.memory-box--fach .memory-col { min-width: 3.25rem; padding: 4px 14px 6px; gap: 6px; }
+.memory-box--fach .memory-col:not(:has(.memory-addr)) { padding-block: 10px; }
+.memory-box--fach .memory-col + .memory-col { border-left: 1px solid var(--feld-rand); }
+.memory-box--fach .memory-addr { order: -1; font-size: var(--fs-s); }
+.memory-box--fach .memory-byte { font-size: var(--fs-l); font-weight: 700; padding: 0; color: var(--text); }
+/* .memory-box--getrennt: wie die Zellen im Datenspeicher der Übungen, jedes Fach mit eigenem
+   Rahmen, abgerundet und mit Abstand. Ohne das Modifikator-Paar bleibt es ein durchgehendes Fenster. */
+.memory-box--fach.memory-box--getrennt { gap: var(--gap-l); border: 0; border-radius: 0; background: none; overflow: visible; }
+.memory-box--getrennt .memory-col { border: 1px solid var(--feld-rand); border-radius: var(--r-s); background: var(--fach); }
+.memory-box--fach .memory-col:has(.memory-byte.highlight) { background: var(--markierung-schreiben); }
+.memory-box--getrennt .memory-col:has(.memory-byte.highlight) { border-color: var(--markierung-schreiben); }
+.memory-box--fach .memory-col:has(.memory-byte.highlight) :is(.memory-addr, .memory-byte) { color: var(--text-auf-farbe); background: none; }
+
+/* Zweispaltiges Layout: Text links, Abbildung rechts, wiederverwendbar
+   für künftige Folien mit demselben Muster (siehe Folie "Machen -
+   Ablauf, Bearbeiten" in data/lektionen/1-1.js). Bricht auf schmalen
+   Fenstern per flex-wrap untereinander um. */
+.slide-split { display: flex; gap: 28px; width: 100%; flex-wrap: wrap; align-items: flex-start; }
+.slide-split-text { flex: 1; min-width: 15rem; }
+.slide-split-figure { flex: none; }
+/* Unterschrift unter einer Abbildung (Lektion 2.3, Syntaxbaum) */
+.slide-split-figure .abbildung-unterschrift { margin: var(--gap-m) 0 0; font-size: var(--fs-s); color: var(--text-dim); text-align: center; }
+.slide-split-figure .slide-code { margin: var(--gap-m) auto 0; }
+.slide-split-figure svg { display: block; width: 20rem; height: auto; max-width: 100%; }
+/* Speichermodell (1-2, Programm- und Datenspeicher) als eigene Spalte: Programmspeicher oben, Datenspeicher darunter */
+.slide-split-figure .robot-stage { flex-direction: column; flex-wrap: nowrap; gap: 16px; }
+.slide-split-figure .lz-mid { width: 23.75rem; }
+/* Speicheraufteilung (1.2, Folie 6): erster Textblock oben links neben dem Datenspeicher,
+   Programmspeicher ganz rechts über beide Zeilen, der zweite Textblock hat die untere Zeile für
+   sich (unter Text und Datenspeicher). Die zweite Zeile ist 1fr: Die Höhe des Programmspeichers
+   wird dort aufgefangen, sonst würde die erste Zeile wachsen und der zweite Text nach unten rutschen. */
+.robot-stage.speicher-raster { display: grid; grid-template-columns: 1fr auto auto; grid-template-rows: auto 1fr; column-gap: 2rem; row-gap: var(--gap-l); width: 100%; align-items: start; }
+/* width: 0 + min-width: 100%: der obere Text füllt seine Spalte, trägt aber nichts zur Breite bei.
+   Die Breite der ersten Spalte kommt so allein vom unteren Text (er reicht über Spalte 1 und 2),
+   der obere bricht auf den Rest neben dem Datenspeicher um. */
+.speicher-raster > .speicher-text-oben { grid-area: 1 / 1 / 2 / 2; width: 0; min-width: 100%; }
+.speicher-raster > .lz-mid { grid-area: 1 / 2 / 2 / 3; width: 22rem; }
+.speicher-raster > .lz-prog { grid-area: 1 / 3 / 3 / 4; }
+.speicher-raster > .speicher-text-unten { grid-area: 2 / 1 / 3 / 3; }
+.slide-split-figure .robot-stage.modell-cpu-spalte { display: grid; grid-template-columns: 23.75rem 20rem; grid-template-rows: auto 1fr; gap: 16px 28px; align-items: start; }
+.modell-cpu-spalte .lz-mid { display: contents; }
+.modell-cpu-spalte .lz-prog { grid-column: 1; grid-row: 1 / span 2; }
+.modell-cpu-spalte .lz-mid > .robot-card:not(.lz-cpu) { grid-column: 2; grid-row: 2; }
+.modell-cpu-spalte .lz-cpu { grid-column: 2; grid-row: 1; }
+.slide-split-figure .robot-rt-grid-wrap { padding: 0; }
+.slide-split-figure .robot-rt-grid-wrap.robot-rt-grid-wrap-kompakt { padding: 0; }
+.slide-split-figure .robot-rt-grid-wrap svg { width: 23rem; display: block; }
+

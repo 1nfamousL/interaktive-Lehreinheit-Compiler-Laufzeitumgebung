@@ -1,0 +1,33 @@
+/* ---- einstellungen: darstellung ---- */
+/* Gemeinsames Raster für alle Zeilen: Spalte 1 Beschriftungen (linksbündig), Spalte 2 Umschalter.
+   Die Zeilen lösen sich per display: contents auf, damit beide Umschalter in derselben Spalte
+   liegen und gleich breit werden (so breit wie der breiteste). */
+.einst-raster { display: grid; grid-template-columns: auto auto; align-items: center; column-gap: 28px; row-gap: var(--gap-l); }
+.einst-zeile { display: contents; }
+/* Strich zwischen zwei Einstellungen: über beide Spalten, aber nur so breit wie das Raster,
+   also nicht bis an den Rand des Pop-ups */
+.einst-trenner { grid-column: 1 / -1; width: 100%; margin: 0; border: none; border-top: 1px solid var(--border); }
+.einst-label { color: var(--text); font-size: var(--fs-l); font-weight: 600; }
+/* Zwei gleich breite Hälften (1fr 1fr), die breitere Beschriftung gibt die Breite vor */
+.theme-seg { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border); border-radius: var(--r-m); overflow: hidden; background: var(--panel-2); }
+.theme-seg button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; font: inherit; font-size: var(--fs-l); font-weight: 500; padding: 0.5rem 1rem; border: none; background: transparent; color: var(--text-dim); cursor: pointer; transition: .15s; }
+/* Sonne/Mond (ICON_HELL, ICON_DUNKEL in app.js): Schriftfarbe des Knopfs */
+.einst-icon { width: 1rem; height: 1rem; flex: none; }
+.theme-seg button + button { border-left: 1px solid var(--border); }
+.theme-seg button:hover { background: var(--panel-hover); color: var(--text); }
+.theme-seg button[aria-checked="true"] { background: var(--accent); color: var(--weiss); }
+.theme-seg button:focus-visible { outline: 2px solid var(--accent-text); outline-offset: -2px; }
+/* Zeile "Größe": nur ein Hinweis auf den Browser-Zoom, kein Umschalter. Höchstens so breit,
+   dass das Pop-up nicht breiter wird als nötig. */
+.einst-text { margin: 0; max-width: 34ch; color: var(--text-dim); font-size: var(--fs-m); line-height: 1.7; }
+
+/* Tastenkappe für Tastenkürzel (ZOOM_TEXT in app.js), gleiche Farbrollen wie .mini-knopf */
+.taste {
+  display: inline-block; min-width: 1.6em; padding: 1px 6px; box-sizing: border-box;
+  border: 1px solid var(--border); border-bottom-width: 2px; border-radius: var(--r-s);
+  background: var(--panel-2); color: var(--text);
+  font: inherit; font-size: var(--fs-xs); font-weight: 600; line-height: 1.5; text-align: center;
+}
+/* Ein Tastenkürzel links in einer Hilfe-Zeile: Tasten nebeneinander */
+.tasten { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+

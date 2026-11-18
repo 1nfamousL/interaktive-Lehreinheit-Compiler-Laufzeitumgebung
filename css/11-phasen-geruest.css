@@ -1,0 +1,173 @@
+/* ---- phasenübungen: gemeinsames gerüst und codegenerierung ---- */
+/* Phasenanzeige, Seitenspalte und Raster-Markierungen der Übungen
+   compiler-weg*.js. Baut auf den Roboter-Styles (10-roboter.css) auf. Die Zellgröße
+   wird per Inline-Style aus JS gesetzt. */
+.robot-ue-phases { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; font-size: var(--fs-s); font-weight: 700; }
+.robot-ue-phase { padding: 0.375rem 0.75rem; border-radius: 999px; border: 1px solid var(--border); color: var(--text-dim); }
+.robot-ue-phase.active { border-color: var(--accent-text); background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--text); }
+.robot-ue-phase-sep { color: var(--text-dim); }
+.robot-ue-side { width: 18.75rem; flex: none; display: flex; flex-direction: column; gap: 16px; }
+.robot-ue-side[hidden], .robot-ue-result[hidden] { display: none; }
+.robot-ue-pal { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.robot-ue-pal .robot-mblock { cursor: grab; }
+.robot-mrow.robot-ue-active .robot-mblock-placed { box-shadow: 0 0 0 3px var(--accent-text); }
+.robot-ue-grid .robot-figure svg { width: 1.875rem; height: 2.1875rem; }
+.robot-rt-cell.robot-ue-visited { background: color-mix(in srgb, var(--ok) 18%, transparent); }
+.robot-ue-result { max-width: 28.75rem; border-radius: var(--r-l); padding: 14px 16px; font-size: var(--fs-l); line-height: 1.45; border: 1px solid var(--border); }
+.robot-ue-result.robot-ue-ok { border-color: var(--meldung-erfolg-rand); background: var(--meldung-erfolg); }
+.robot-ue-result.robot-ue-err { border-color: color-mix(in srgb, var(--fehler-stark) 60%, transparent); background: color-mix(in srgb, var(--fehler-stark) 12%, transparent); }
+/* Hinweis wie .lex-result.lex-err: Rückmeldung auf einen Versuch in der Codegenerierung */
+.robot-ue-result.robot-ue-hinweis { border-color: var(--meldung-hinweis-rand); background: var(--meldung-hinweis); }
+
+/* Codegenerierung (js/exercises/compiler-weg-codegen.js, entstanden aus code-generierung.js):
+   baut auf den Roboter-Styles oben auf (Programmspeicher, Ablage, Buttons,
+   Drag-Ghost). Neu sind das helle Hochsprachen-Fenster,
+   die passive Speicher-/Registeranzeige, Farbe + Symbol pro Befehlsgruppe
+   und die Bedienelemente im platzierten Baustein. */
+.cg-left { width: 18.75rem; flex: none; display: flex; flex-direction: column; gap: 16px; }
+.cg-source {
+  background: var(--quelltext-bg);
+  color: var(--quelltext-text);
+  border: 1px solid var(--border);  /* Rahmen wie .robot-card, die anderen Fenster der Übung */
+  border-radius: var(--r-l);
+  padding: 22px 24px;
+  min-height: 10rem;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+.cg-source-title { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: var(--fs-l); letter-spacing: .2px; color: var(--text); font-weight: 600; margin: 0 0 14px; }
+/* "Programmspeicher" wie die übrigen Fensterüberschriften (Befehle,
+   Datenspeicher, Register, Flag): fett, 17 px */
+.cg-build > .robot-ref-title, .lz-prog > .robot-ref-title { font-size: var(--fs-l); letter-spacing: .2px; }
+.lz-cpu > h2 { font-size: var(--fs-l); font-weight: 600; letter-spacing: .2px; }
+
+/* Pfeil zwischen den Phasen in der Phasenanzeige */
+.cw-app > .robot-ue-phases .robot-ue-phase-sep { font-size: 1.5625rem; line-height: 1; }
+.cg-source-empty { color: var(--papier-dim); font-size: var(--fs-s); line-height: 1.5; }
+.cg-source-code { margin: 0; font: inherit; font-size: var(--fs-l); line-height: 1.6; white-space: pre-wrap; }
+/* Überschriften in Karten (Datenspeicher, Register, Flag, Rechenwerk): normale Schreibweise, fett, so groß wie "Befehle" */
+.cg-sub { font-size: var(--fs-l); letter-spacing: .2px; color: var(--text-dim); font-weight: 600; margin: 16px 2px 8px; }
+.robot-card h2 + .cg-sub { margin-top: 6px; }
+.robot-card > .cg-sub:first-child { margin-top: 2px; }
+
+/* Speicher und Register: nur Anzeige, Werte kommen erst zur Laufzeit */
+.cg-mem-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.cg-reg-row { display: flex; gap: 10px; }
+.cg-mem-cell { flex: 1; border: 1px solid var(--feld-rand); border-radius: var(--r-s); background: var(--fach); padding: 4px 0 6px; text-align: center; transition: .2s; }
+.cg-mem-cell.highlight { background: var(--markierung-schreiben); border-color: var(--markierung-schreiben); }
+.cg-mem-cell.highlight .cg-mem-addr { color: var(--text-auf-farbe); }
+.cg-mem-addr, .cg-reg-name { display: block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: var(--fs-s); color: var(--text-dim); padding-bottom: 6px; }
+.cg-reg-name { font-size: var(--fs-m); font-weight: 700; padding-bottom: 0; }
+/* Registerzellen: Name mittig, gleiche Höhe wie die Flag-Zelle. Das leere
+   Wertfeld wird ausgeblendet, bis der Laufzeitteil Werte anzeigt. */
+.cg-mem-cell.cg-reg { min-height: 3rem; display: flex; align-items: center; justify-content: center; padding: 0; }
+.cg-reg .cg-mem-val { display: none; }
+.cg-mem-val { display: block; height: 0.875rem; }
+/* Flag: eigene Überschrift und Zeile unter den Registern, so breit wie ein
+   Register. "1/0" steht mittig, die Zelle ist so hoch wie eine
+   Registerzelle. */
+.cg-mem-cell.cg-flag { flex: 0 0 calc(50% - 5px); min-height: 3rem; display: flex; align-items: center; justify-content: center; padding: 0; }
+.cg-flag-val { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: var(--fs-m); font-weight: 700; color: var(--text-dim); }
+
+/* Spalten oben bündig statt auf die höchste Spalte gestreckt. Programmspeicher
+   und Ablage bilden ein Paar: Die Ablage-Karte ist absolut positioniert und
+   trägt damit nichts zur Höhe bei, das Paar ist also genau so hoch wie der
+   Programmspeicher (bis Zeile 10). Die Ablage füllt diese Höhe und scrollt.
+   Bricht die Ablage bei wenig Platz unter den Programmspeicher um, bekommt
+   sie eine Mindesthöhe, sonst wäre sie 0 px hoch. */
+.robot-stage.cg-stage { align-items: flex-start; }
+.cg-pair { display: flex; gap: 28px; flex-wrap: wrap; flex: 1 1 auto; min-width: 0; }
+.cg-pal-side { position: relative; min-height: 20rem; }
+/* Nur senkrecht scrollen. scrollbar-gutter hält den Platz für die
+   Scrollleiste immer frei, damit sich die Breite des Inhalts nicht ändert,
+   wenn sie erscheint. */
+/* Ablage ohne Gruppenüberschriften: Gruppen nur durch Farbe und einen
+   etwas größeren Abstand getrennt */
+.cg-pal-side .robot-ue-pal + .robot-ue-pal { margin-top: 18px; }
+.cg-pal-side h2 { font-size: var(--fs-l); font-weight: 600; }
+/* Programmspeicher mit mehr als 10 Zeilen (config.zeilen, Lektion 4.1):
+   scrollt wie die Ablage nur senkrecht, sichtbar bleiben etwa 10 Zeilen
+   (Zeile = 54 px Slot + 2 x 5 px Abstand). Da der Programmspeicher die Höhe
+   des Paars vorgibt, ist die Ablage daneben genauso hoch. */
+.cg-rows-scroll, .lz-rows-scroll { position: relative; overflow-y: auto; overflow-x: hidden; scrollbar-gutter: stable; padding-right: 4px; }
+.cg-rows-scroll { max-height: 40rem; }
+/* Laufzeit: Zeilen ohne Slot-Rahmen sind etwas niedriger (44 px + Abstand).
+   In Kapitel 2–6 überschreibt compiler-weg-laufzeit-faecher.js die Höhe passend zur Folie. */
+.lz-rows-scroll { max-height: 33.75rem; }
+.cg-pal-side > .robot-card { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; scrollbar-gutter: stable; }
+
+/* Bausteine: Farbe und Symbol pro Gruppe, gilt für Ablage und Programmspeicher */
+/* Maschinencode-Fenster (compiler-weg-codegen.js) ist so breit wie der breiteste Baustein */
+.cg-build { max-width: 37.5rem; }
+.cw-app .cg-build { flex: none; width: fit-content; min-width: 0; }
+/* Das Paar aus Maschinencode und Ablage wächst nicht mehr, Datenspeicher und Register
+   stehen so direkt dahinter statt ganz rechts außen */
+.cw-app .cg-pair { flex: 0 1 auto; }
+/* Keine feste Mindesthöhe für die Ablage: Sie ist so hoch wie der Maschinencode daneben,
+   also mindestens so hoch wie seine Überschrift und ein Befehl */
+.cw-app .cg-pal-side { min-height: 0; }
+/* Kapitel 6, Syntaxanalyse und semantische Analyse: Syntaxbaum und AST reichen bis zum
+   unteren Rand der Folie und scrollen innen. Dafür wird die Folie zur Spalte, und jede Ebene
+   bis zur Zeile mit Baum und Seitenleiste füllt die übrige Höhe. Die Baumfläche zählt für die
+   Höhe nicht mit (height: 0), sie bestimmt also nur der Rest. Ragt davon etwas über den Rand,
+   scrollt die Folie. (Codegenerierung und Laufzeit wachsen dagegen mit ihrem Inhalt, ihre
+   Höchsthöhe setzen compiler-weg-codegen.js und compiler-weg-laufzeit-faecher.js.) */
+/* In allen Phasen füllt die Übung die Folie bis unten. So liegt der Anker der Ergebnisleiste
+   (.cw-leiste-anker, ganz am Ende) immer am unteren Rand der Folie, auch wenn die Phase
+   kürzer ist. */
+.slide:has(> .cw-app) { flex-direction: column; flex-wrap: nowrap; }
+.slide:has(> .cw-app) > .cw-app { flex: 1 0 auto; display: flex; flex-direction: column; }
+.cw-app > .cw-host { flex: 1 0 auto; }
+.cw-app > .cw-host:has(.pb-stage) { display: flex; flex-direction: column; }
+/* Syntaxbaum und AST: Die Baumfläche scrollt jetzt auch senkrecht */
+.cw-app .pb-stage { flex: 1 0 auto; align-items: stretch; }
+.cw-app .pb-canvas { flex: 1 1 auto; padding: var(--pad-l); }
+.cw-app .pb-canvas > .pb-msg { top: var(--pad-l); right: var(--pad-l); }
+.cw-app .pb-tree-scroll { flex: 1 1 auto; height: 0; min-height: 18.75rem; overflow: auto; }
+/* Der Baum beginnt oben in der gepunkteten Fläche, mit kleinem Abstand statt 40px */
+.cw-app .pb-tree { padding-top: 16px; }
+/* Die Seitenleiste zählt für die Höhe der Zeile nicht mit (contain: size, ihre Breite steht
+   fest). Sonst würde eine hohe Seitenleiste, etwa mit Symboltabelle in der semantischen
+   Analyse, die Baumfläche über den Rand der Folie hinaus strecken. Ihr Inhalt ragt dann
+   sichtbar über den Rand, und die Folie scrollt. */
+.cw-app .pb-sidebar { contain: size; }
+.cg-messzeile { visibility: hidden; height: 0; overflow: hidden; padding: 0; pointer-events: none; }
+.cg-block { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.cg-block::before { content: ""; width: 0.75rem; height: 0.75rem; flex: none; }
+.cg-name { white-space: nowrap; }
+.cg-xfer { background: var(--befehl-mov); } .cg-xfer::before { border-radius: var(--r-s); background: var(--befehl-mov-symbol); }
+.cg-calc { background: var(--befehl-rechnen); } .cg-calc::before { transform: rotate(45deg); background: var(--befehl-rechnen-symbol); }
+.cg-cmp { background: var(--befehl-vergleich); } .cg-cmp::before { background: var(--befehl-vergleich-symbol); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.cg-jump { background: var(--befehl-sprung); } .cg-jump::before { border-radius: 50%; background: var(--befehl-sprung-symbol); }
+.cg-move { background: var(--befehl-bewegung); } .cg-move::before { border-radius: var(--r-s); background: var(--befehl-bewegung-symbol); }
+.cg-halt { background: var(--befehl-end); color: var(--befehl-end-text); } .cg-halt::before { border-radius: 50%; background: var(--befehl-end-symbol); }
+/* Baustein ohne das Gruppen-Symbol (z. B. in Textfolien, Lektion 1-2) */
+.cg-block.cg-ohne-symbol::before { display: none; }
+/* Kapitel 6 (compiler-weg.js): in allen Phasen ohne Symbol vor den Befehlen */
+.cw-app .cg-block::before { display: none; }
+/* Dasselbe Aussehen mitten im Satz (Lektion 1-2): <span class="cg-block cg-xfer cg-ohne-symbol cg-inline"> */
+.cg-block.cg-inline { display: inline-block; padding: 1px 8px; border-radius: var(--r-s); color: var(--text-auf-farbe); font-weight: 700; font-size: var(--fs-m); line-height: 1.5; }
+/* Fach mit Zahl oder Adresse mitten im Satz (Lektion 1-2), wie .robot-mblock-placed.lz-fach in den Übungen */
+.lz-fach-inline { display: inline-block; padding: 1px 8px; border-radius: var(--r-s); background: var(--feld); border: 1px solid var(--feld-rand); color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight: 700; font-size: var(--fs-m); line-height: 1.5; }
+.robot-mblock-placed.cg-block { flex-wrap: wrap; gap: 8px 10px; font-size: var(--fs-m); }
+.robot-mblock-placed.cg-block .robot-mblock-remove { margin-left: auto; }
+/* Bausteine, auf die sich ein Hinweis nach „Überprüfen“ bezieht: Hinweisfarbe wie die Meldung */
+.robot-mblock-placed.cg-err { box-shadow: 0 0 0 3px var(--meldung-hinweis-rand); }
+.cw-app > .robot-ue-phases { flex-wrap: wrap; margin-bottom: var(--gap-l); }
+/* Aufgabe der Phase links neben den Knöpfen (einzelphase.js), wie .dd-hint in 1.3. contain: inline-size nimmt dem
+   Text die Breite für die Größe der Folie: Eine inhaltsbreite Folie wird durch ihn nicht breiter, er bricht um.
+   Die Zeile hat die Höhe der Knöpfe, damit nichts springt, wenn "Schritt vormachen" erscheint. */
+.cw-aufgabe { flex: 1 1 0; min-width: 0; contain: inline-size; margin: 0; font-size: var(--fs-l); font-weight: 400; line-height: 1.5; color: var(--text-dim); }
+.cw-app > .robot-ue-phases:has(> .cw-aufgabe) { min-height: 2.5rem; }
+/* Platzierte Bausteine lassen sich im Programmspeicher verschieben (Klassen
+   robot-movable/robot-dragging, siehe Roboter-Styles oben). */
+
+/* Bedienelemente im platzierten Baustein, angelehnt an .robot-mem-ref */
+.cg-opc { display: inline-flex; align-items: center; gap: 6px; }
+.cg-seg { display: inline-flex; border-radius: var(--r-s); overflow: hidden; background: color-mix(in srgb, var(--aufhellung) 55%, transparent); }
+.cg-seg button { border: none; background: transparent; font: inherit; font-size: var(--fs-s); font-weight: 700; padding: 0.25rem 0.5rem; cursor: pointer; color: var(--text-auf-farbe); }
+.cg-seg button.on { background: var(--text-auf-farbe); color: var(--weiss); }
+.cg-field { font: inherit; font-size: var(--fs-m); font-weight: 700; color: var(--text-auf-farbe); background: color-mix(in srgb, var(--aufhellung) 55%, transparent); border: none; border-radius: var(--r-s); padding: 4px 6px; cursor: pointer; }
+input.cg-field { width: 4rem; cursor: text; }
+.cg-field.cg-sel-mem { background: var(--feld-speicher); }
+.cg-field.cg-sel-line { background: var(--feld-zeile); }
+

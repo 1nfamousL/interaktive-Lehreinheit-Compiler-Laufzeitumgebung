@@ -1,0 +1,74 @@
+/* ---- semantik (compiler-weg-semantik.js) ---- */
+/* Baut auf dem Syntaxbaum-Parser oben auf: Stage, Baumfläche, Linien, Knoten,
+   Meldung, Seitenleiste und Buttons kommen aus den .pb-* Regeln. Hier steht nur,
+   was neu ist: Notizen im Baum, aktueller Knoten, Symboltabelle, Aktionen. */
+.sem-knoten { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+/* Der abstrakte Syntaxbaum besteht nicht aus den Nichtterminalen der Grammatik. Seine Knoten
+   zeigen Namen, Typen und Schlüsselwörter aus dem Quellcode (schritte, number, moveRight) und
+   müssen so stehen, wie sie dort geschrieben sind. Deshalb keine Großschreibung wie bei .pb-nt. */
+.sem-knoten.pb-nt { text-transform: none; letter-spacing: normal; }
+/* Notiz unter dem Knoten: Typ oder Status der Prüfung */
+.sem-ann { font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; font-size: var(--fs-m); font-weight: 600; color: var(--c-literal-text); }
+.sem-knoten.erledigt { border-color: color-mix(in srgb, var(--ok) 60%, var(--border)); }
+/* Aktueller Knoten: Ring wie beim aktuellen Token in der Parser-Übung */
+.sem-knoten.cur { border-color: var(--accent-text); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+.sem-knoten.err { border-color: var(--fehler-baum); color: var(--fehler-baum); box-shadow: 0 0 0 3px color-mix(in srgb, var(--fehler-baum) 30%, transparent); }
+.sem-knoten.err .sem-ann { color: var(--fehler-baum); }
+
+.sem-cur { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.sem-curbox {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: var(--fs-l); font-weight: 600;
+  max-width: 100%; overflow-wrap: anywhere;
+  padding: 9px 16px; border-radius: var(--r-m);
+  border: 1.5px solid var(--accent-text); background: var(--panel);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.sem-curbox.fin { border-color: var(--border); box-shadow: none; color: var(--text-dim); }
+.sem-curbox.bad { border-color: var(--fehler-baum); color: var(--fehler-baum); background: color-mix(in srgb, var(--fehler-baum) 14%, transparent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--fehler-baum) 30%, transparent); }
+.sem-detail { font-size: var(--fs-m); line-height: 1.4; color: var(--text-dim); }
+.sem-aufgabe { font-size: var(--fs-l); line-height: 1.45; }
+
+/* Symboltabelle: ein Kasten pro Bereich, innere Bereiche eingerückt */
+.sem-tabelle { display: flex; flex-direction: column; gap: 8px; }
+.sem-bereich { border: 1px solid var(--border); border-radius: var(--r-m); background: var(--panel); padding: 8px 10px 10px; display: flex; flex-direction: column; gap: 4px; }
+.sem-zeile {
+  display: flex; justify-content: space-between; gap: 12px; width: 100%; text-align: left;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: var(--fs-m); color: var(--text); padding: 5px 9px; border-radius: var(--r-s);
+  border: 1px solid transparent; background: transparent;
+}
+.sem-zeile span:last-child { color: var(--c-literal-text); }
+button.sem-zeile.klick { cursor: pointer; border-color: color-mix(in srgb, var(--accent) 55%, var(--border)); background: color-mix(in srgb, var(--accent) 10%, transparent); transition: .12s; }
+button.sem-zeile.klick:hover { background: color-mix(in srgb, var(--accent) 25%, transparent); border-color: var(--accent-text); }
+.sem-leer { font-size: var(--fs-m); font-style: italic; color: var(--text-dim); padding: 2px 9px; }
+/* Mini-Symboltabelle im Lektionstext (2.4, Folie 3): derselbe Bereich wie in der Übung, nur so breit
+   wie sein Inhalt */
+.sem-bereich--text { width: fit-content; min-width: 13.75rem; }
+/* 2.4 Folie 3: Die Tabelle sieht aus wie in der Übung (Seitenleiste der Semantik in .cw-app): Innenabstand --pad-l, alle Texte in
+   Folientextgröße */
+.sem-bereich--uebung { padding: var(--pad-l); }
+.sem-bereich--uebung .pb-label, .sem-bereich--uebung .sem-zeile { font-size: var(--fs-l); }
+/* Mehrere Bereiche untereinander (4.4 Folie 2) haben denselben Abstand wie in der Übung (--gap-l) */
+.sem-tabelle:has(> .sem-bereich--uebung) { gap: var(--gap-l); }
+
+/* Aktionen: pro Gruppe eine Überschrift und eine Reihe Knöpfe */
+.sem-aktionen { display: flex; flex-direction: column; gap: 14px; }
+.sem-gruppe { display: flex; flex-direction: column; gap: 8px; }
+.sem-gruppe-titel { font-size: var(--fs-m); color: var(--text-dim); }
+.sem-reihe { display: flex; flex-wrap: wrap; gap: 8px; }
+.sem-aktion { cursor: pointer; text-align: center; }
+.sem-aktion:disabled, .sem-fehlerknopf:disabled { opacity: .4; cursor: not-allowed; }
+.sem-typ { font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; border-radius: var(--r-m); }
+
+/* Fehlerknöpfe: gestrichelt in Warnfarbe wie die Fläche "Syntaxfehler" */
+.sem-fehler-reihe { display: flex; flex-wrap: wrap; gap: 8px; }
+.sem-fehlerknopf {
+  flex: 1 1 auto;
+  border: 1.5px dashed var(--warn); color: var(--warn); background: transparent;
+  border-radius: var(--r-m); padding: 0.5625rem 0.75rem;
+  font: inherit; font-size: var(--fs-m); font-weight: 600; text-align: center;
+  cursor: pointer; transition: background .12s;
+}
+.sem-fehlerknopf:hover:not(:disabled) { background: color-mix(in srgb, var(--warn) 12%, transparent); border-style: solid; }
+

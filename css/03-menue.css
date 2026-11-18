@@ -1,0 +1,200 @@
+/* ---- hauptmenü ---- */
+/* Hauptmenü: die einzige Screen-Variante, die zentriert und ohne eigene
+   Überschrift auskommt (app.js setzt hier keinen Titel im Inhalt, nur den
+   Text in der Kopfleiste), erkennbar am Start-Button. */
+#app:has(#btnStart) {
+  /* Einheitlicher Abstand zwischen allen Zeilen des Titels und zu den Buttons.
+     In rem, damit er wie die Titelschrift mit der Fenstergröße wächst (Buttons: 4 Lücken). */
+  --mt-luecke: 0.75rem;
+  position: relative;
+  align-items: center;
+  text-align: center;
+  /* Der Inhalt (Titel bis Daten-Buttons) steht mittig zwischen dem oberen Rahmen und der
+     Terminal-Zeile (.tp, hier im Fluss ganz unten): oben kein Innenabstand, unten 18px bis zum
+     Rand. Der Titel (.mt) und die Daten-Buttons (.progress-tools) haben je einen automatischen
+     Außenabstand zur freien Seite und teilen sich den Restplatz gleichmäßig. Bei niedrigen
+     Fenstern gibt es keinen Restplatz, dann scrollt #app (kein Abschneiden oben). */
+  padding-top: 0;
+  padding-bottom: 18px;
+}
+#app:has(#btnStart) > .mt { margin-top: auto; }
+#app:has(#btnStart) > .progress-tools { margin-bottom: auto; }
+
+/* Hilfe + Zahnrad oben rechts im Hauptmenü, gleiche Buttons wie in der
+   Kopfzeile von Kapitelübersicht und Lektion (.head-actions), nur absolut in
+   die Ecke gesetzt. */
+.menu-head-actions { position: absolute; top: 18px; right: 18px; margin-left: 0; }
+
+/* Terminal-Zeile unten links im Hauptmenü (js/terminal-prompt.js). Sie steht als letztes Element
+   im Fluss von #app (flex), damit der Abstand zum Inhalt aus ihrer echten Höhe folgt. Links 18px
+   vom Rand (Innenabstand von #app abgezogen). margin-top: der Gap von #app (14px) minus 2px, die
+   der obere Rahmen beim Abstand "Rahmen bis Titel" dazugibt: so sind der Abstand Rahmen bis Titel
+   und der Abstand Daten-Buttons bis Zeile gleich groß. */
+.tp {
+  align-self: flex-start;
+  margin: -12px 0 0 calc(18px - var(--pad-l));
+  max-width: calc(100% - 2 * (18px - var(--pad-l)));
+  display: flex;
+  gap: 12px;
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-size: var(--fs-s);
+  text-align: left;
+}
+.tp-pfad { color: var(--muted); }
+.tp-pfad b { font-weight: 400; color: var(--tp-pfad); }
+.tp-pfad b.tp-ich { color: var(--text); }
+.tp-befehl { color: var(--tp-gruen); }
+.tp-cursor {
+  display: inline-block;
+  width: .6em;
+  height: 1.15em;
+  margin-left: 4px;
+  vertical-align: text-bottom;
+  background: var(--tp-gruen);
+  animation: tp-blinken 1s steps(1) infinite;
+}
+@keyframes tp-blinken { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .tp-cursor { animation: none; } }
+
+/* Titel im Hauptmenü (Markup in renderMenu()). Linksbündig innerhalb eines
+   zentrierten Blocks, Schriftgrößen skalieren mit der Fensterbreite, damit
+   die beiden Pipeline-Boxen auch bei der Mindestbreite von 1000px passen.
+   Der Titel-h1 und die Pipeline bestehen aus <span>s (display per CSS), weil
+   in einer Überschrift keine <div> stehen dürfen. */
+.mt {
+  /* fit-content statt fester Breite: der Block ist genau so breit wie sein
+     breitester Inhalt und wird so vom zentrierten #app wirklich mittig
+     gesetzt, nicht nur ein breiterer, linksbündiger Kasten. */
+  width: fit-content;
+  max-width: 100%;
+  text-align: left;
+  font-family: var(--mono);
+  /* Größe der großen Titelzeilen (.mt-zeile, .mt-pipeline): 2.875rem (46px) minus 10 %. */
+  --mt-schrift: 2.5875rem;
+}
+.mt-kicker { margin: 0; font-size: var(--fs-xl); font-weight: 500; color: var(--text); }
+.mt-kommentar { margin: var(--mt-luecke) 0 0; font-size: var(--fs-l); color: var(--muted); }
+/* Die große Zeile "Zusammenspiel von" hat über den Versalien viel leeren
+   Raum (Zeilenhöhe der großen Titelschrift). text-box schneidet ihn oben bis zur
+   Versalhöhe ab, damit der sichtbare Abstand zur Zeile darüber so klein ist
+   wie der zwischen Kicker und der Zeile "für die Programmierlehre zum Thema" (wie bei .btn-label). */
+.mt-titel { margin: var(--mt-luecke) 0 0; font-weight: 600; display: flex; flex-direction: column; gap: var(--mt-luecke); }
+.mt-zeile { font-size: var(--mt-schrift); line-height: 1.2; color: var(--text); text-box: trim-start cap alphabetic; }
+
+/* Zeile "Compiler und Laufzeitumgebung" als Raster mit 3 Spalten und 2 Zeilen:
+   oben die Wörter (Compiler und Laufzeitumgebung mit Unterstrich), unten
+   COMPILE TIME rechtsbündig, der Pfeil mittig unter dem "und" und RUN TIME
+   linksbündig, so dass beide Beschriftungen zum Pfeil hin zeigen. */
+.mt-pipeline {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  justify-content: start;
+  align-items: center;
+  row-gap: calc(var(--mt-luecke) / 2);
+  font-size: var(--mt-schrift);
+  line-height: 1.2;
+}
+/* Oben bis zur Versalhöhe zugeschnitten (wie .mt-zeile), damit der Abstand
+   zur Zeile "Zusammenspiel von" darüber nur der gap von .mt-titel ist. Unten
+   bewusst nicht: dort sitzt der Unterstrich. */
+.mt-name, .mt-und { align-self: baseline; text-box: trim-start cap alphabetic; }
+.mt-name {
+  padding-bottom: .12em;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 60%, transparent);
+}
+/* Der Verlauf füllt die Schrift nur innerhalb des Kastens (background-clip: text), und der Kasten
+   ist oben auf Versalhöhe gekürzt. Das "und" hat Oberlängen (d) und ragt darüber hinaus: Innenabstand oben gibt dem Verlauf
+   dort Platz, der negative Außenabstand hebt ihn für die Lage wieder auf. */
+.mt-und {
+  padding: .25em .5em 0;
+  margin-top: -.25em;
+  background: linear-gradient(90deg, var(--compile), var(--run));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.mt-compile { color: var(--compile); }
+.mt-run { color: var(--run); }
+.mt-label {
+  font-size: var(--fs-s);
+  font-weight: 500;
+  letter-spacing: .1em;
+  opacity: .75;
+}
+.mt-label.mt-compile { text-align: right; }
+.mt-label.mt-run { text-align: left; }
+.mt-pfeil { display: flex; align-items: center; width: clamp(1.575rem, 2.7vw, 2.25rem); justify-self: center; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--mt-pfeil) 55%, transparent)); }
+.mt-schaft { flex: 1; height: 3px; border-radius: var(--r-s); background: linear-gradient(90deg, var(--compile), var(--run)); }
+.mt-spitze {
+  width: 0;
+  height: 0;
+  margin-left: -2px;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 13px solid var(--run);
+}
+
+.menu-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  width: min(clamp(13.75rem, 22vw, 26.25rem), 100%);
+  margin-top: calc(4 * var(--mt-luecke));
+}
+
+.primary {
+  font: inherit;
+  font-size: var(--fs-m);
+  font-weight: 600;
+  padding: 0.9375rem 1.125rem;
+  border-radius: var(--r-l);
+  background: var(--primary);
+  border: 1px solid transparent;
+  color: var(--primary-text);
+  cursor: pointer;
+  transition: .15s;
+}
+.primary:hover { background: var(--primary-hover); }
+
+.menu-btn {
+  font: inherit;
+  font-size: var(--fs-m);
+  font-weight: 600;
+  padding: 0.9375rem 1.125rem;
+  border-radius: var(--r-l);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  transition: .15s;
+}
+.menu-btn:hover { background: var(--panel-hover); border-color: var(--border-hover); }
+/* Fortsetzen: gleiche Farbe wie der Start-Knopf der Roboter-Übung (.robot-check-btn) */
+.menu-btn.menu-btn-akzent { background: var(--accent); border-color: transparent; color: var(--weiss); }
+.menu-btn.menu-btn-akzent:hover { background: var(--accent); border-color: transparent; filter: brightness(1.1); }
+.menu-btn.menu-btn-akzent:disabled { opacity: .5; cursor: not-allowed; filter: none; }
+
+.progress-tools {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  width: min(clamp(13.75rem, 22vw, 26.25rem), 100%);
+}
+
+.secondary {
+  flex: 1;
+  font: inherit;
+  font-size: var(--fs-m);
+  font-weight: 600;
+  padding: 0.75rem 0.875rem;
+  border-radius: var(--r-m);
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+  cursor: pointer;
+  transition: .15s;
+}
+.secondary:hover { background: var(--panel-hover); border-color: var(--border-hover); }
+

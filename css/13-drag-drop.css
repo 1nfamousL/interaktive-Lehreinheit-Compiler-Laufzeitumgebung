@@ -1,0 +1,168 @@
+/* ---- drag & drop-diagramm (drag-drop-diagram.js, lektion 1.3) ---- */
+/* Bewusst feste Pixelgrößen statt dynamischer flex-grow-Berechnung: die
+   Übung soll immer gleich groß aussehen, unabhängig von der verfügbaren
+   Breite des Folienbereichs. */
+/* Arbeitsanweisung über dem Diagramm, gleiche Größe wie Folientext */
+/* Kopfzeile über dem Diagramm: Arbeitsanweisung links, "Schritt vormachen" ganz rechts (wie in den anderen Übungen).
+   Die Mindesthöhe ist die des Knopfes, damit das Diagramm nicht springt, wenn er erscheint. */
+.dd-kopf { display: flex; align-items: center; gap: var(--gap-l); min-height: 2.5rem; margin: 0 0 8px; }
+.dd-hint { font-size: var(--fs-l); line-height: 1.5; color: var(--text-dim); margin: 0; }
+.dd-stage { display: flex; align-items: flex-start; gap: var(--gap-l); flex-wrap: nowrap; }
+.dd-diagram-wrap { flex: none; width: 58.25rem; }
+.dd-diagram-wrap svg { width: 100%; height: auto; display: block; }
+
+.dd-tray {
+  flex: none;
+  /* So breit wie die Begriffe (siehe .dd-chip). */
+  width: max-content;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-l);
+  padding: 16px;
+}
+.dd-tray h2 {
+  font-size: var(--fs-l);
+  font-weight: 600;
+  color: var(--text-dim);
+  margin: 0;
+}
+/* Die Ablage behält ihre Größe, auch wenn Begriffe herauskommen: Die Liste reserviert Platz für alle Begriffe
+   (--dd-anzahl setzt die Übung, ein Begriff ist 2.75rem hoch, dazwischen 8px). Alles in rem, so wächst sie mit der
+   Schriftgröße. Ohne --dd-anzahl (Ablage unten) gilt der Rückfall. */
+.dd-tray { --dd-liste: calc(var(--dd-anzahl) * 2.75rem + (var(--dd-anzahl) - 1) * 8px); }
+.dd-chip-list { display: flex; flex-direction: column; gap: 8px; min-height: var(--dd-liste, 1.25rem); }
+/* Erfolgstext in der geleerten Ablage: mittig über dem reservierten Platz der Liste, ohne die Größe der Ablage zu ändern */
+.dd-tray { position: relative; }
+.dd-erfolg { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--gap-m); padding: 16px; margin: 0; text-align: center; color: var(--ok); font-size: var(--fs-m); font-weight: 600; line-height: 1.4; pointer-events: none; }
+.dd-erfolg[hidden] { display: none; }
+.dd-erfolg::before, .pz-erfolg::before { content: ''; flex: none; width: 1.75rem; height: 1.75rem; mask: url("../assets/check-circle.svg") no-repeat center / contain; background-color: var(--ok); }
+/* Begriffe so groß wie die Felder im Diagramm (150 x 44, siehe 1-3.js),
+   damit der Text in der Ablage denselben Innenabstand hat wie im Feld. */
+.dd-chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 9.375rem;
+  height: 2.75rem;
+  box-sizing: border-box;
+  padding: 0 6px;
+  white-space: nowrap;
+  border-radius: var(--r-m);
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  font-size: var(--fs-l);
+  font-weight: 600;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+/* Ablage rechts scrollt selbst: Der Container der Übung füllt die Höhe der Folie (height: 100%,
+   dafür muss er eine Spalte sein), die Bühne nimmt den Rest unter dem Hinweis (min-height: 0, sonst
+   würde sie nie kleiner als ihr Inhalt) und die Ablage darf höchstens so hoch werden wie die Bühne.
+   Nur die Begriffsliste scrollt, Titel "Begriffe" bleibt stehen. Ist die Folie
+   selbst für das Diagramm zu niedrig, scrollt wie bisher die Folie. scrollbar-gutter hält Platz für
+   die Scrollleiste frei, sonst misst width: max-content der Ablage sie nicht mit und die Begriffe
+   würden beschnitten. */
+.dd-scroll { height: 100%; display: flex; flex-direction: column; }
+.dd-scroll .dd-kopf { flex: none; }
+.dd-scroll .dd-stage { flex: 1; min-height: 0; }
+.dd-scroll .dd-tray { max-height: 100%; min-height: 0; }
+.dd-scroll .dd-chip-list { flex: 1 1 var(--dd-liste, auto); min-height: 0; overflow-y: auto; scrollbar-gutter: stable; }
+/* Breite der Ablage halten, wenn die Liste leer wird: Ein unsichtbares Element so breit wie ein Begriff bleibt in der
+   Liste, ihre Breite samt reserviertem Platz für die Scrollleiste ändert sich dadurch nicht. (Ein min-width an der Liste
+   hätte die Scrollleiste nicht mitgezählt, die Ablage wäre am Ende um deren Breite schmaler.) Der negative Rand hebt den
+   Abstand (gap) vor dem Element wieder auf, es ist 0 hoch und verändert die Höhe der Liste nicht. */
+.dd-scroll .dd-chip-list::after { content: ''; flex: none; width: 9.375rem; height: 0; margin-top: -8px; }
+
+.dd-chip:active { cursor: grabbing; }
+.dd-chip.dragging { opacity: 0; }
+.dd-chip svg { width: 1rem; height: 1rem; flex: none; fill: var(--text); }
+
+.dd-chip-ghost {
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  height: 2.75rem;
+  box-sizing: border-box;
+  padding: 0 6px;
+  white-space: nowrap;
+  border-radius: var(--r-m);
+  border: 1px solid var(--accent-text);
+  background: var(--panel);
+  color: var(--text);
+  font-size: var(--fs-l);
+  font-weight: 600;
+  pointer-events: none;
+  box-shadow: 0 14px 34px -10px color-mix(in srgb, var(--schatten) 65%, transparent);
+}
+.dd-chip-ghost svg { width: 1rem; height: 1rem; flex: none; fill: var(--text); }
+
+
+/* Ablage unten (config.ablage = "unten"): Leiste unter dem Diagramm, so
+   breit wie das Diagramm, die Chips laufen nebeneinander. Diagramm und
+   Leiste sind 1400px breit (viewBox des Diagramms = 1400, also Maßstab 1:1),
+   alle Chips so groß wie die Felder im Diagramm (126 x 44). */
+.dd-stage.dd-unten { flex-direction: column; }
+.dd-unten .dd-diagram-wrap { width: 87.5rem; }
+.dd-unten .dd-tray { width: 87.5rem; box-sizing: border-box; }
+.dd-unten .dd-chip-list { flex-direction: row; flex-wrap: wrap; }
+.dd-unten .dd-chip, .dd-chip-ghost.dd-ghost-gleich {
+  width: 7.875rem; height: 2.75rem; box-sizing: border-box;
+  padding: 0 6px; justify-content: center; white-space: nowrap;
+}
+
+.dd-phase-box { fill: var(--panel-2); stroke: var(--border); stroke-width: 1.5; }
+/* Schriftgrößen im Diagramm-SVG (.dd-phase-label, .dd-pfad-label, .dd-node-label)
+   sind Werte im SVG-Koordinatenraum (viewBox 932 breit), bewusst px statt rem
+   oder var(--fs-*): das SVG wird mit .dd-diagram-wrap (58.25rem = 932 Einheiten
+   bei 16px Grundschrift) skaliert, die Schrift wächst also schon über die
+   Breite mit. Ein rem-Wert würde doppelt skalieren. 17 und 15 entsprechen
+   --fs-l und --fs-m bei Faktor 1. */
+.dd-phase-label {
+  fill: var(--accent-text);
+  font-size: 17px;
+  font-weight: 600;
+  /* y im SVG = Mitte der Schrift statt Grundlinie, daher im Diagramm
+     einfach y = Mitte des Kastens setzen. */
+  dominant-baseline: central;
+}
+/* Beschriftung eines Weges im Diagramm (z. B. "AOT: ..."), Schriftgröße wie
+   .dd-phase-label im SVG-Koordinatenraum (Maßstab 1:1). */
+.dd-pfad-label { fill: var(--text-dim); font-size: 15px; }
+.dd-pfad-name { fill: var(--text); font-weight: 700; }
+.dd-node-box { fill: var(--panel); stroke: var(--border); stroke-width: 1.5; }
+.dd-node-label { fill: var(--text); font-size: 17px; font-weight: 600; }
+.dd-edge { fill: none; stroke: var(--text-dim); stroke-width: 1.75; }
+.dd-arrow-head { fill: var(--text-dim); }
+.dd-node-icon { fill: var(--text); }
+
+.dd-drop-zone-box {
+  fill: color-mix(in srgb, var(--hover-ton) 2%, transparent);
+  stroke: var(--text-dim);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 5;
+  pointer-events: all;
+}
+.dd-filled-box { opacity: 0; transition: opacity .15s ease; pointer-events: none; }
+.dd-term-slot.solved .dd-filled-box { opacity: 1; }
+.dd-term-slot.solved .dd-drop-zone-box { opacity: 0; }
+/* Feld unter dem gezogenen Begriff, gleiche Farben wie .robot-slot-active */
+.dd-drop-zone-box { transition: fill .12s, stroke .12s; }
+.dd-term-slot.active .dd-drop-zone-box { stroke: var(--accent-text); fill: color-mix(in srgb, var(--accent) 12%, transparent); }
+
+.dd-term-slot.wrong .dd-drop-zone-box { stroke: var(--meldung-hinweis-rand); }
+@keyframes dd-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+.dd-term-slot.wrong { animation: dd-shake .25s ease; }
+

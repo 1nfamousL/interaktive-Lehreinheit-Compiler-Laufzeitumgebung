@@ -1,0 +1,256 @@
+/* ---- phasen-zuordnung (phasen-zuordnung.js, quiz in lektion 6.1) ---- */
+.pz { width: 100%; display: flex; flex-direction: column; gap: var(--gap-l); }
+/* Wie .cw-app (siehe dort): Die Übung füllt die Höhe der Folie, auch wenn der Inhalt kürzer ist. Nur so liegt
+   die Rückmeldung (.cw-leiste, hängt am Ende der Übung) wirklich unten rechts in der Folie und nicht unter
+   den Blöcken. Wächst der Inhalt darüber hinaus, scrollt die Folie, und die Leiste klebt am unteren Rand. */
+.slide:has(> .pz) { flex-direction: column; flex-wrap: nowrap; }
+.slide:has(> .pz) > .pz { flex: 1 0 auto; }
+/* Drei Arten von Karten, jede mit ihrer Farbe (--pz-farbe, Rollen in :root). Die Klassen stehen an der
+   Karte, am Chip im Block und am Bereich bzw. an der Lücke, in die sie gehört. */
+.pz-art-aufgabe { --pz-farbe: var(--pz-aufgabe); --pz-farbe-text: var(--pz-aufgabe-text); }
+.pz-art-fehler { --pz-farbe: var(--pz-fehler); --pz-farbe-text: var(--pz-fehler-text); }
+.pz-art-ergebnis { --pz-farbe: var(--pz-ergebnis); --pz-farbe-text: var(--pz-ergebnis-text); }
+
+/* Oben bleibt eine Zeile stehen, während die Folie scrollt (die Blöcke wachsen mit jeder Karte): die
+   aktuelle Karte, die Anzahl und ganz rechts "Zurücksetzen" (Knopf wie in den anderen Übungen, .cw-reset-btn).
+   Wie .screen-head--sticky: negativer Rand und Abstand gleichen das Innenpadding der Folie aus, der
+   Hintergrund deckt ab, was darunter durchscrollt. */
+.pz-fest {
+  position: sticky;
+  top: calc(-1 * var(--pad-xl));
+  z-index: 5;
+  margin: calc(-1 * var(--pad-xl)) calc(-1 * var(--pad-xl)) 0;
+  padding: var(--gap-m) var(--pad-xl);
+  background: var(--panel);
+  display: flex;
+  align-items: center;
+  gap: var(--gap-l);
+}
+/* "Schritt vormachen" und "Zurücksetzen" (Klassen wie in den anderen Übungen): Die Zeile hat selbst --gap-l, der
+   zusätzliche Rand von .cw-schritt-btn + .cw-reset-btn (für Zeilen mit 10px gap) entfällt hier */
+.pz-fest .cw-schritt-btn:not([hidden]) + .cw-reset-btn { margin-left: 0; }
+/* Die Knöpfe bleiben oben rechts, auch wenn die Karte daneben höher wird (sonst stehen sie mittig in der Zeile) */
+.pz-fest .cw-schritt-btn, .pz-fest .cw-reset-btn { align-self: flex-start; }
+/* Die Karte oben ist so breit wie ihr Inhalt, mindestens 400px, damit sie immer zweizeilig bleibt (Etikett, darunter
+   der Text bzw. bei Fehlern Etikett und Fehlerart, darunter die Codezeile) und nicht in der Höhe wächst. Erst
+   über 640px, also bei sehr langen Texten, bricht sie um. */
+.pz-stapel { flex: 0 1 auto; width: max-content; min-width: 25rem; max-width: 40rem; min-height: 4rem; display: flex; align-items: center; }
+/* Der Zähler steht links vor der Karte: feste Mindestbreite und gleich breite Ziffern, damit die Karte nicht
+   wandert, wenn aus "Karte 9 von 47" "Karte 10 von 47" wird */
+/* Am Ende steht hier statt der Karte die Erfolgsmeldung (wie .dd-erfolg in der Ablage von 1.3, nur linksbündig);
+   sie darf so breit werden wie ihr Satz */
+.pz-stapel:has(> .pz-erfolg) { max-width: none; }
+.pz-erfolg { display: flex; align-items: center; gap: var(--gap-m); margin: 0; color: var(--ok); font-size: var(--fs-m); font-weight: 600; line-height: 1.4; }
+.pz-zaehler { min-width: 8em; color: var(--text-dim); font-size: var(--fs-m); font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+/* Die Rückmeldung ist die Leiste der anderen Übungen (.cw-leiste, unten rechts über der Übung), hier mit X
+   zum Schließen: rechts Platz dafür */
+/* Doppelte Klasse, weil .cw-leiste weiter unten im Stylesheet steht und mit seinem padding sonst gewinnen würde */
+.cw-leiste:is(.pz-leiste, .dd-leiste) { padding-right: 56px; }
+/* Aufbau wie in den Meldungen der Compiler-Phasen: Symbol und fester Titel (.meldung-titel) in der ersten Zeile,
+   darunter der Satz, der Knopf "Zeige Hinweis" und der Hinweistext, alles ganz links (siehe .meldung-titel
+   weiter unten). Die Leiste ist dafür eine Spalte; der Text darf dann keine Höhe (flex-basis) mehr aus der
+   Zeilenansicht mitbringen. Der Hinweis bricht um und macht die Leiste beim Aufklappen nicht breiter (width: 0). */
+.cw-leiste:is(.pz-leiste, .dd-leiste) { flex-direction: column; align-items: stretch; justify-content: flex-start; flex-wrap: nowrap; gap: 8px; }
+.cw-leiste:is(.pz-leiste, .dd-leiste) > .cw-leiste-text { flex: none; }
+.cw-leiste:is(.pz-leiste, .dd-leiste) > .lex-btn-hinweis { align-self: flex-start; margin: 0; }
+.cw-leiste:is(.pz-leiste, .dd-leiste) > .lex-hinweis-text { margin-top: 0; padding-left: 0; font-size: inherit; color: inherit; width: 0; min-width: 100%; }
+
+.pz-karte {
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  /* Alle drei Arten sind gleich hoch, sonst springt die Leiste und mit ihr die ganze Übung, sobald eine Fehlerkarte
+     kommt: Die Fehlerkarte (Etikett + Codezeile) ist die höchste, daran richtet sich die Mindesthöhe aus. */
+  min-height: 4.4375rem;
+  padding: 10px 14px;
+  border-radius: var(--r-m);
+  border: 1.5px solid var(--pz-farbe);
+  background: var(--panel);
+  color: var(--text);
+  font-size: var(--fs-l);
+  font-weight: 600;
+  line-height: 1.35;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+/* Fehlerkarte: Etikett der Art und Fehlerart stehen nebeneinander in einer Zeile, darunter die Codezeile */
+.pz-kartenkopf { display: flex; align-items: baseline; gap: var(--gap-m); }
+.pz-karte:active { cursor: grabbing; }
+.pz-karte.zieht { opacity: .35; }
+/* Die Geisterkarte hängt am body, daher eigene Regel statt unter .pz. Beim Ziehen ist sie klein und leicht
+   durchsichtig (nur der Text, ohne Etikett der Art, die Farbe der Art zeigt der Rahmen), damit man sieht, wohin
+   man sie legt. */
+.pz-karte-geist {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  width: max-content;
+  max-width: 16.25rem;
+  min-height: 0;
+  padding: 5px 10px;
+  gap: 2px;
+  opacity: .85;
+  font-size: var(--fs-m);
+  box-shadow: 0 8px 20px -8px color-mix(in srgb, var(--schatten) 65%, transparent);
+}
+.pz-karte-geist .pz-tag { display: none; }
+.pz-karte-geist .pz-codezeile { font-size: var(--fs-xs); }
+/* Etikett der Art ("Kernaufgabe", "Fehler", "Eingabe / Ausgabe") auf der Karte oben: Das zweite Merkmal neben der Farbe */
+.pz-tag { font-size: var(--fs-m); font-weight: 600; color: var(--pz-farbe-text); }
+.pz-etikett { font-size: var(--fs-m); font-weight: 600; color: var(--text); }
+.pz-zusatz { font-size: var(--fs-xs); font-weight: 500; color: var(--text-dim); }
+/* Codezeile wie in den Lexik- und Codegenerierungsfenstern: dunkel auf Papier */
+.pz-codezeile {
+  display: block;
+  padding: 4px 8px;
+  border-radius: var(--r-s);
+  background: var(--quelltext-bg);
+  color: var(--quelltext-text);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: var(--fs-s);
+  font-weight: 500;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Die Kette: Zeile 1 die Klammern, Zeile 2 die Lücken für die Ergebnisse, Zeile 3 Blöcke und Pfeile.
+   Die Spalten setzt der Code. */
+/* flex: 1 0 auto schiebt die Rückmeldung nach unten. Die Zeilen bleiben so hoch wie ihr Inhalt (align-content),
+   die Blöcke werden also nicht bis zum Folienrand gestreckt. */
+/* margin-top hebt den Abstand der Übung (.pz, gap) zur Leiste wieder auf: Zwischen Karte und Strich der Gruppe
+   bleiben so nur der Innenabstand der Leiste und die halbe Zeilenhöhe der Beschriftung (zusammen etwa 15px). */
+.pz-weg { --pz-pfeil: 28px; flex: 1 0 auto; display: grid; grid-template-rows: auto auto auto; align-content: start; row-gap: var(--gap-m); margin-top: calc(-1 * var(--gap-l)); }
+.pz-klammer {
+  grid-row: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  color: var(--pz-gruppe);
+  font-size: var(--fs-s);
+  font-weight: 700;
+  line-height: 1; /* niedrige Zeile: Der Strich in der Mitte rückt näher an die Leiste */
+  white-space: nowrap;
+}
+/* Der Begriff steht mittig in der Linie: links und rechts davon läuft je ein Strich bis zum Rand der Gruppe,
+   so braucht die Beschriftung keine eigene Zeile */
+.pz-klammer::before, .pz-klammer::after {
+  content: '';
+  flex: 1;
+  height: 3px;
+  background: var(--pz-gruppe);
+}
+.pz-klammer-zusatz { color: var(--text-dim); font-weight: 500; }
+.pz-pfeil { grid-row: 3; align-self: center; text-align: center; color: var(--text-dim); font-size: var(--fs-xl); }
+
+/* Lücke für ein Ergebnis, mittig über dem Pfeil zwischen zwei Blöcken. nowrap, damit sie so breit wird
+   wie ihr Inhalt und in die Nachbarspalten ragt. Die erste und letzte schließen bündig mit der Kette ab. */
+.pz-luecke {
+  grid-row: 2;
+  justify-self: center;
+  box-sizing: border-box;
+  min-width: 7rem;
+  /* Höhe einer belegten Lücke (eine Textzeile + Padding + Rand), damit die leere Lücke beim Füllen nicht schrumpft */
+  min-height: calc(var(--fs-m) * 1.3 + 0.9375rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: var(--r-m);
+  border: 1.5px dashed var(--pz-farbe);
+  background: color-mix(in srgb, var(--pz-farbe) 6%, transparent);
+  color: var(--pz-farbe-text);
+  font-size: var(--fs-m);
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .12s;
+}
+.pz-luecke--erste { justify-self: start; }
+.pz-luecke--letzte { justify-self: end; }
+.pz-luecke:hover { background: color-mix(in srgb, var(--pz-farbe) 14%, transparent); }
+.pz-luecke.aktiv { background: color-mix(in srgb, var(--pz-farbe) 22%, transparent); }
+.pz-luecke.belegt { border-style: solid; background: var(--panel); cursor: default; }
+.pz-luecke .pz-text { color: var(--pz-farbe-text); }
+/* Die belegte Lücke ist selbst der Rahmen: Der Chip darin hat keinen eigenen Rand, Hintergrund und Abstand mehr,
+   sonst entsteht ein Rahmen im Rahmen und die Lücke braucht unnötig viel Platz. */
+.pz-luecke .pz-chip { padding: 0; border: 0; background: none; align-items: center; }
+.pz-luecke.belegt { min-width: 0; }
+
+.pz-block {
+  grid-row: 3;
+  min-height: 8.75rem; /* auch der leere Block ist ein gut zu treffendes Ziel */
+  display: flex;
+  flex-direction: column;
+  /* Kein gap und kein Innenrand außer oben über dem Titel: Titel, Strich und die beiden Kästen schließen bündig
+     aneinander und mit dem Rahmen ab. overflow: hidden, damit die Ecken des letzten Kastens den runden Rahmen
+     nicht durchstoßen. */
+  padding: 10px 0 0;
+  overflow: hidden;
+  border-radius: var(--r-l);
+  border: 1.5px solid var(--border);
+  background: var(--panel-2);
+  cursor: pointer;
+  transition: border-color .12s, background .12s;
+}
+.pz-block:hover { border-color: var(--border-hover); }
+/* Ziel unter der gezogenen Karte, gleiche Farben wie .dd-term-slot.active */
+.pz-block.aktiv { border-color: var(--accent-text); background: color-mix(in srgb, var(--accent) 12%, var(--panel-2)); }
+.pz-block.falsch, .pz-luecke.falsch { border-color: var(--meldung-hinweis-rand); animation: dd-shake .25s ease; }
+/* Strich unter dem Titel über die ganze Breite des Blocks (der Block hat links und rechts kein Padding), damit er
+   sich wie ein Fenster mit Kopfzeile anfühlt, in das man etwas einfügt */
+.pz-titel {
+  padding: 0 10px 8px;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--fs-m);
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+  color: var(--text);
+}
+
+/* Zwei Listen im Block, die Karten kommen nach ihrer Art hinein: erst die Kernaufgaben (grün), darunter die
+   Fehler (orange). Jede Liste ist ein eigener Kasten im Stil einer Einzelkarte (dunkel, Strich links in der
+   Farbe der Art), der mit jeder Karte wächst; die Einträge darin sind keine eigenen Kästchen, sondern Zeilen
+   mit einer dünnen Trennlinie (spart Rand und Abstand).
+   Überschriften gibt es nicht, Farbe und Etikett sagen, was es ist. Eine leere Liste nimmt keinen Platz ein. */
+.pz-liste {
+  display: flex;
+  flex-direction: column;
+  padding: 2px 8px;
+  border-radius: 0; /* eckig: Die Kästen schließen bündig an Strich, Nachbarkasten und Rahmen an (der Block schneidet die Ecken ab) */
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--pz-farbe);
+  background: var(--panel);
+}
+.pz-liste:empty { display: none; }
+.pz-liste .pz-chip { padding: 6px 0; border: 0; border-radius: 0; background: none; }
+.pz-liste .pz-chip + .pz-chip { border-top: 1px solid var(--border); }
+.pz-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 6px 8px;
+  border-radius: var(--r-s);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--pz-farbe);
+  background: var(--panel);
+  color: var(--text);
+  font-size: var(--fs-m);
+  font-weight: 500;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.pz-chip .pz-etikett { font-size: var(--fs-m); font-weight: 500; }
+/* Auf der Karte oben knapperes Padding in der Codezeile, damit die Fehlerkarte nicht höher wird als die anderen */
+.pz-karte .pz-codezeile { padding: 2px 8px; }
+/* 13px: bewusster Wert zwischen --fs-xs und --fs-s (Wunsch), steht außerhalb der Skala */
+.pz-chip .pz-codezeile { font-size: 0.8125rem; font-weight: 400; }
+

@@ -1,0 +1,256 @@
+/* ---- pop-up-fenster und hilfe-nachbildungen ---- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  /* Weniger abgedunkelt, dafür stärker weichgezeichnet: die App tritt zurück, bleibt aber erkennbar */
+  background: color-mix(in srgb, var(--overlay) 40%, transparent);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+.modal {
+  width: min(100ch, 100%);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-l);
+  box-shadow: 0 20px 60px -10px color-mix(in srgb, var(--schatten) 60%, transparent);
+  overflow: hidden;
+  /* Höchstens so hoch wie der Bildschirm (abzüglich Rand der Abdeckung). Ist der Inhalt
+     länger, bleibt das Fenster zentriert, die Kopfzeile steht fest und nur der Inhalt
+     darunter scrollt. */
+  max-height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
+}
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+/* Titel aller Pop-ups: 20px, bewusst außerhalb der Schriftskala */
+.modal-head h3 { margin: 0; font-size: 1.25rem; font-weight: 600; }
+.modal-close { position: relative; flex: none; width: 1.75rem; height: 1.75rem; padding: 0; border: none; border-radius: var(--r-s); background: transparent; color: var(--text-dim); cursor: pointer; transition: .15s; }
+.modal-close:hover { background: color-mix(in srgb, var(--hover-ton) 10%, transparent); color: var(--text); }
+.modal-body { padding: 22px 20px; min-height: 0; overflow-y: auto; }
+.modal-head { flex: none; }
+.modal-text p { margin: 0 0 10px; font-size: var(--fs-l); line-height: 1.6; color: var(--text); }
+.modal-text p:last-child { margin-bottom: 0; }
+/* Pop-up der Semantikregeln: Trennlinie zwischen den Regeln (jede Regel ist ein Absatz), nach der letzten keine */
+.modal-text--regeln p { margin: 0; padding: var(--gap-l) 0; border-bottom: 1px solid var(--border); }
+.modal-text--regeln p:first-child, .modal-text--regeln .modal-abschnitt + p { padding-top: 0; }
+.modal-text--regeln p:last-child, .modal-text--regeln p:has(+ .modal-abschnitt) { padding-bottom: 0; border-bottom: 0; }
+/* Gruppen der Regeln: Überschrift wie die Abschnitte im Hilfe-Pop-up (.modal-abschnitt), der Satz zu jeder Regel gedämpft */
+.regel-satz { display: block; color: var(--text-dim); font-size: var(--fs-m); }
+/* Die Gruppenüberschriften sind gedämpft wie der Satz, nur in diesem Pop-up (im Hilfe-Pop-up bleiben sie in Textfarbe).
+   Doppelte Klasse, weil .modal-text .modal-abschnitt weiter unten steht und sonst mit gleicher Spezifität gewinnt. */
+.modal-text.modal-text--regeln .modal-abschnitt { color: var(--text-dim); }
+/* Abschnittsüberschrift im Hilfe-Pop-up (Übung / Bedienung der Lektion) */
+.modal-text .modal-abschnitt { margin: 30px 0 10px; font-size: var(--fs-l); font-weight: 600; color: var(--text); }
+.modal-text .modal-abschnitt:first-child { margin-top: 0; }
+/* Lizenzangabe der Icons unter dem Text im Info-Modal (LIZENZ_HTML in app.js): klein, grau, Text zum Aufklappen */
+.lizenz { margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--border); font-size: var(--fs-xs); color: var(--text-dim); }
+.lizenz summary { cursor: pointer; }
+.lizenz pre { margin: 10px 0 0; max-height: 13.75rem; overflow: auto; white-space: pre-wrap; font-size: var(--fs-xs); line-height: 1.5; color: var(--text-dim); }
+
+/* Variante 'fit' (siehe openModal): Fenster passt sich der breitesten Zeile
+   an, Überschrift mittig. Das X sitzt absolut rechts, der seitliche Padding
+   des Kopfs hält ihm Platz frei, damit es die Überschrift nie überdeckt. */
+.modal--fit { width: fit-content; max-width: 100%; }
+.modal--fit .modal-head { position: relative; justify-content: center; padding: 16px 52px; }
+/* Titel der Einstellungen (einziges Pop-up mit 'fit'): fetter als die übrigen */
+.modal--fit .modal-head h3 { font-weight: 700; }
+.modal--fit .modal-close { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); }
+
+/* Variante 'hilfe' (z. B. Hilfe zum Hauptmenü): schmaler als das normale Pop-up, damit die Zeilen
+   gut lesbar bleiben. Bei 800px bleiben rechts neben der linken Spalte (170px) der Hilfe-Zeilen
+   rund 570px, also etwa 60 bis 75 Zeichen. Dazu eine Trennlinie zwischen den Absätzen. Die Linie
+   liegt im Inhalt, endet also am Padding des Fensters statt wie die Kopfzeile am Rand. */
+.modal--hilfe { width: min(50rem, 100%); }
+/* Titel des Fensters mittig (wie bei .modal--fit, das × steht absolut rechts), die Abschnitte darin
+   (Übung / Bedienung der Lektion) bleiben linksbündig */
+.modal--hilfe .modal-head { position: relative; justify-content: center; padding: 16px 52px; }
+.modal--hilfe .modal-close { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); }
+/* Titel fest 20px (bewusst nicht aus der Schriftskala, wächst nicht mit dem Browser-Zoom), Abschnitte so groß wie der Text */
+.modal--hilfe .modal-head h3 { font-size: 1.25rem; font-weight: 600; }
+.modal--hilfe .modal-text p { margin: 0; }
+/* Warndreieck im Fließtext (WARN_ICON in js/app.js): so groß wie die Schrift, auf der Grundlinie */
+.warn-icon { display: inline-block; width: 1em; height: 1em; vertical-align: -0.125em; color: var(--meldung-hinweis-titel); }
+.modal--hilfe .modal-text p + p,
+.modal--hilfe .hilfe-zeile + .hilfe-zeile { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+
+/* Hilfe-Zeile: links Nachbildungen der Knöpfe, rechts der Text. Die linke Spalte ist
+   fest breit, damit alle Texte auf einer Kante beginnen. */
+/* Abbildung links waagerecht in ihrer Spalte und senkrecht zum Text daneben mittig */
+.hilfe-zeile { display: grid; grid-template-columns: 10.625rem 1fr; gap: var(--gap-l); align-items: center; }
+.hilfe-knoepfe { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+/* Mini-Knopf: nur Abbildung, gleiche Farbrollen wie die echten Knöpfe im Menü
+   (.secondary, .primary, .menu-btn-akzent, .icon-btn), aber kleiner und nicht klickbar */
+.mini-knopf {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0.25rem 0.625rem; border-radius: var(--r-s);
+  font-size: var(--fs-s); font-weight: 600; white-space: nowrap;
+  background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+}
+.mini-knopf--akzent { background: var(--accent); color: var(--weiss); border-color: transparent; }
+.mini-knopf--primaer { background: var(--primary); color: var(--primary-text); border-color: transparent; }
+.mini-knopf--icon { padding: 0.25rem; background: transparent; color: var(--text-dim); }
+.mini-knopf--icon svg { width: 1.125rem; height: 1.125rem; }
+.mini-knopf svg.mini-chevron { width: 0.875rem; height: 0.875rem; margin-right: 4px; transform: scaleX(-1); }
+/* Reiter, der gerade nicht gewählt ist: nur Schrift, wie in .view-tabs */
+.mini-knopf--flach { background: transparent; border-color: transparent; color: var(--text-dim); }
+
+/* Hilfe zur Kapitelübersicht: Nachbildungen der Kapitelzeile, der Lektionskarten und des Balkens.
+   Farben wie bei den echten Elementen (.chapter-num, .lesson-card, .progress-fill). */
+.mini-kapitel { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-s); font-weight: 500; color: var(--abgeschlossen); white-space: nowrap; }
+.mini-kapitel.neu { color: var(--text-dim); }
+.mini-kapitel .mini-chevron { width: 0.875rem; height: 0.875rem; color: var(--text-dim); }
+.mini-kapitel .kapitel-fertig { width: 1.1em; height: 1.1em; color: var(--abgeschlossen); }
+/* Hilfe zur Phasen-Zuordnung: Etikett der drei Kartenarten (Farbe über .pz-art-*) */
+.mini-pz-tag { display: inline-block; padding: 3px 10px; border-radius: var(--r-s); border: 1.5px solid var(--pz-farbe); background: var(--panel); color: var(--pz-farbe-text); font-size: var(--fs-m); font-weight: 600; white-space: nowrap; }
+/* Karte, Ziel (Block) und Eintrag im Block wie .pz-karte, .pz-block und .pz-chip der Zuordnung: Die Karte hat den Rand ihrer Art, der Block
+   die dunkle Fläche mit Rand (orange bei einem falschen Zug, wie .pz-block.falsch), der Eintrag den farbigen Streifen links */
+.mini-pz-karte { display: inline-block; padding: 3px 10px; border-radius: var(--r-s); border: 1.5px solid var(--pz-farbe); background: var(--panel); color: var(--text); font-size: var(--fs-s); font-weight: 600; white-space: nowrap; }
+.mini-pz-ziel { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; min-width: 4.5rem; min-height: 1.875rem; padding: 3px 8px; border-radius: var(--r-s); border: 1.5px solid var(--border); background: var(--panel-2); color: var(--text-dim); font-size: var(--fs-s); font-weight: 600; white-space: nowrap; }
+.mini-pz-ziel.falsch { border-color: var(--meldung-hinweis-rand); }
+.mini-pz-chip { display: inline-block; padding: 2px 8px; border: 1px solid var(--border); border-left: 3px solid var(--pz-farbe); background: var(--panel); color: var(--text); font-size: var(--fs-s); font-weight: 500; }
+/* Hilfe zur Mindmap: Begriff und Begriff mit "neu"-Punkt */
+.mini-begriff { position: relative; display: inline-block; padding: 3px 12px; border: 1px solid var(--mindmap-zweig-rand); border-radius: 999px; background: var(--mindmap-zweig); font-size: var(--fs-s); font-weight: 500; color: var(--mindmap-text); white-space: nowrap; }
+.mini-begriff.neu::after { content: ""; position: absolute; top: -2px; right: -2px; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--mindmap-neu); }.mini-karten { display: flex; gap: 8px; }
+/* Hilfe zur Lektion: Folienpunkte mit Verbindungslinie, verkleinert wie .slide-dot/.slide-connector */
+.mini-punkte { display: flex; align-items: center; gap: 4px; }
+.mini-punkt { display: grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: 50%; border: 1px solid var(--border); font-size: var(--fs-xs); font-weight: 500; color: var(--text-dim); }
+.mini-verbinder { width: 0.625rem; height: 2px; border-radius: var(--r-s); background: var(--verbinder); }
+/* Hilfe zum Roboter-Programm (hilfeHtml() in robot-programm.js): Bewegungsbefehle in der Farbe der
+   echten Bausteine (.robot-m-dir), eine Programmzeile mit Nummer und ×, das Warnsymbol der
+   Fehlermeldung (.robot-exc) */
+.mini-befehle { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+.mini-befehl { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: var(--r-s); background: var(--befehl-bewegung); color: var(--text-auf-farbe); font-size: var(--fs-s); font-weight: 700; white-space: nowrap; }
+.mini-befehl .mini-zahl { margin-left: 6px; padding: 0 4px; border-radius: var(--r-s); background: var(--panel); color: var(--text); font-weight: 500; }
+.mini-befehl .mini-x { margin-left: 8px; opacity: .7; }
+.mini-programmzeile { display: inline-flex; align-items: center; gap: 6px; }
+.mini-zeilennr { color: var(--text-dim); font-size: var(--fs-s); }
+.mini-warnung { display: block; width: 1.375rem; height: 1.375rem; background-color: var(--fehler-stark); mask: url("../assets/warning-triangle.svg") no-repeat center / contain; }
+/* Hilfe zum Diagramm (HILFE_HTML in drag-drop-diagram.js): Begriffskarte (.dd-chip), freies Feld
+   (.dd-drop-zone-box, gestrichelt), abgewiesenes Feld (.dd-term-slot.wrong) und belegtes Feld
+   (.dd-node-box), jeweils in denselben Farben */
+.mini-dd { display: inline-flex; align-items: center; gap: 6px; }
+.mini-dd-karte { padding: 3px 8px; border-radius: var(--r-s); border: 1px solid var(--border); background: var(--panel); color: var(--text); font-size: var(--fs-s); font-weight: 600; white-space: nowrap; }
+.mini-dd-pfeil { color: var(--text-dim); font-size: var(--fs-s); }
+.mini-dd-feld { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; min-width: 4rem; height: 1.625rem; padding: 0 8px; border-radius: var(--r-s); border: 1.5px dashed var(--text-dim); background: color-mix(in srgb, var(--hover-ton) 2%, transparent); color: var(--text); font-size: var(--fs-s); font-weight: 600; white-space: nowrap; }
+.mini-dd-feld.falsch { border-color: var(--meldung-hinweis-rand); }
+.mini-dd-feld.gefuellt { border-style: solid; border-color: var(--border); background: var(--panel); }
+/* Hilfe zur Lexik: Nachbildungen der Werkzeuge (.lex-tool) und des Vorschaufelds (.lex-peek-box) */
+.mini-tool { display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px; border-radius: var(--r-s); border: 1px solid var(--border); background: var(--panel); color: var(--text); font-size: var(--fs-s); font-weight: 600; white-space: nowrap; }
+.mini-swatch { width: 1rem; height: 1rem; border-radius: var(--r-s); flex: none; box-sizing: border-box; box-shadow: inset 0 0 0 1px var(--farbmuster-rand); }
+.mini-swatch--radierer { background: transparent !important; border: 2px dashed var(--text-dim); box-shadow: none; }
+.mini-peek-box {
+  display: grid; place-items: center; width: 2rem; height: 2rem; flex: none; box-sizing: border-box;
+  background: var(--papier); color: var(--papier-text);
+  border: 2px dashed var(--text-dim); border-radius: var(--r-s);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: var(--fs-l); font-weight: 600;
+}
+.mini-peek-box.mini-peek-leer { color: var(--lex-leer); }
+.mini-zeichen { display: inline-flex; gap: 6px; }
+/* Hilfe zur Syntax: Nachbildungen des Tokens (.pb-tok, Farbe der Kategorie über --tk) und der
+   Fläche "Syntaxfehler melden" (.pb-errzone-cw) */
+.mini-token {
+  padding: 3px 8px; border-radius: var(--r-s);
+  border: 1.5px solid var(--tk, var(--border)); background: color-mix(in srgb, var(--tk, var(--panel)) 12%, var(--panel));
+  color: var(--text); font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: var(--fs-s); font-weight: 600; white-space: nowrap;
+}
+/* Nichtterminal wie .pb-chip: Pille, Großbuchstaben, etwas weniger Innenabstand */
+.mini-chip { padding: 5px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--panel); color: var(--text); font-size: var(--fs-xs); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+/* Nichtterminal im Lektionstext (Kapitel 2, Folie "Die Grammatik"): dieselbe Kapsel, im Satz
+   mit Abstand nach oben und unten */
+.mini-chip--text { display: inline-block; margin-block: 3px; }
+/* Grammatikregeln (Lektion 2.3): Raster aus Name, Pfeil und rechter Seite. Die rechte Seite bricht
+   nicht um (nowrap), die Folie wird stattdessen so breit wie die längste Regel. */
+.grammatik { display: grid; grid-template-columns: max-content max-content max-content; column-gap: var(--gap-m); row-gap: var(--gap-m); align-items: center; width: fit-content; }
+.grammatik-rumpf { white-space: nowrap; }
+.grammatik-pfeil, .grammatik-zeichen { color: var(--text-dim); }
+/* Pop-up der Syntaxregeln: dasselbe Raster mit einem Satz unter jeder Regel. Der Satz ist gedämpft, bricht um und macht das
+   Raster nicht breiter (width: 0, min-width: 100%). Das Pop-up ist so breit wie die längste Regel (die rechte Seite bricht nicht um). */
+.grammatik--regeln { grid-template-columns: max-content max-content 1fr; row-gap: 2px; width: 100%; margin-top: var(--gap-l); }
+/* Zwischen den Regeln eine Trennlinie über die ganze Breite (die dritte Spalte füllt den Rest), nach der letzten keine */
+.grammatik-satz { grid-column: 1 / -1; width: 0; min-width: 100%; margin-bottom: var(--gap-l); padding-bottom: var(--gap-l); border-bottom: 1px solid var(--border); color: var(--text-dim); font-size: var(--fs-m); line-height: 1.5; }
+.grammatik-satz:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: 0; }
+.modal--regeln { width: fit-content; min-width: min(50rem, 100%); max-width: 100%; }
+/* Übersicht aller Tokens nach Gruppen (3.2): Gruppenname links, Tokens rechts. Neue Tokens tragen einen Rahmen. */
+.token-uebersicht { display: grid; grid-template-columns: max-content max-content; column-gap: var(--gap-l); row-gap: var(--gap-m); align-items: center; width: fit-content; }
+.token-uebersicht-gruppe { font-weight: 600; }
+/* Fenster um die Übersicht: so breit wie die Übersicht, nicht über die ganze Folie gezogen */
+.token-uebersicht-fenster, .grammatik-fenster { align-self: flex-start; }
+.token-marke--neu { outline: 2px solid var(--accent); outline-offset: 1px; }
+/* Hilfe zur Semantik: Nachbildungen des aktuellen Knotens (.sem-curbox) und einer anklickbaren
+   Zeile der Symboltabelle (button.sem-zeile.klick) */
+.mini-curbox {
+  padding: 4px 12px; border-radius: var(--r-s);
+  border: 1.5px solid var(--accent-text); background: var(--panel); color: var(--text);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: var(--fs-s); font-weight: 600; white-space: nowrap;
+}
+.mini-zeile {
+  display: inline-flex; justify-content: space-between; gap: 14px; min-width: 6.875rem; padding: 3px 9px; border-radius: var(--r-s);
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--border)); background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--text);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; font-size: var(--fs-s);
+}
+.mini-zeile span:last-child { color: var(--c-literal-text); }
+/* Hilfe zur Codegenerierung: Nachbildungen von Quellcode (.cg-source), Baustein (.cg-block), seinen
+   Feldern (.cg-field), dem Entfernen-Knopf und den Speicherzellen (.cg-mem-cell) */
+.mini-papier {
+  padding: 6px 10px; border-radius: var(--r-s); background: var(--papier); color: var(--papier-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: var(--fs-s); line-height: 1.5; white-space: nowrap;
+}
+.mini-baustein {
+  display: inline-flex; align-items: center; gap: 8px; padding: 5px 10px; border-radius: var(--r-s);
+  color: var(--text-auf-farbe); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--fs-s); font-weight: 700; white-space: nowrap;
+}
+.mini-baustein--mov { background: var(--befehl-mov); }
+.mini-baustein--sprung { background: var(--befehl-sprung); }
+.mini-feld { padding: 1px 6px; border-radius: var(--r-s); background: color-mix(in srgb, var(--aufhellung) 55%, transparent); }
+.mini-feld--zelle { background: var(--feld-speicher); }
+.mini-feld--zeile { background: var(--feld-zeile); }
+.mini-entfernen { display: inline-grid; place-items: center; width: 1.25rem; height: 1.25rem; border-radius: var(--r-s); background: color-mix(in srgb, var(--schatten) 15%, transparent); }
+.mini-zellen { display: inline-flex; gap: 6px; }
+.mini-zelle {
+  min-width: 2.75rem; padding: 4px 8px; border: 1px solid var(--feld-rand); border-radius: var(--r-s); background: var(--fach); text-align: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: var(--fs-s); color: var(--text-dim);
+}
+.mini-zelle--name { font-weight: 700; }
+.mini-zelle-wert { color: var(--text); font-weight: 700; }
+/* Hilfe zum Laufzeitsystem: Nachbildungen der CPU-Anzeigen (.lz-cpu-grid, .lz-alu), der Phasen
+   (.lz-phases) und des Roboters im Spielfeld */
+.mini-kv { display: inline-flex; flex-direction: column; align-items: center; gap: 3px; }
+.mini-kv-key { font-size: var(--fs-xs); color: var(--text-dim); }
+.mini-kv-val {
+  padding: 3px 10px; border-radius: var(--r-s); border: 1px solid var(--feld-rand); background: var(--feld); color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: var(--fs-s); font-weight: 700; white-space: nowrap;
+}
+.mini-phase { padding: 0.125rem 0.75rem; border-radius: 999px; border: 1px solid var(--border); color: var(--text-dim); font-size: var(--fs-xs); font-weight: 700; }
+.mini-fehlerknopf { padding: 0.25rem 0.625rem; border-radius: var(--r-s); border: 1px dashed var(--fehler-knopf); color: var(--fehler-knopf); font-size: var(--fs-s); font-weight: 600; white-space: nowrap; }
+.mini-knopf .chevron { width: 0.875rem; height: 0.875rem; }
+.mini-knopf:has(.chevron) { gap: 4px; }
+/* Rand und Leuchten für angefangen/abgeschlossen kommen aus denselben Regeln wie .lesson-card */
+.mini-karte { display: block; width: 2.125rem; height: 1.5rem; border: 2px solid var(--border); border-radius: var(--r-s); background: var(--panel); }
+.mini-balken { display: block; width: 6.25rem; height: 0.375rem; border-radius: 999px; background: var(--fortschritt-spur); overflow: hidden; }
+.mini-balken > span { display: block; width: 40%; height: 100%; border-radius: 999px; background: var(--fortschritt); }
+
+/* Schließen-Symbol in Meldungen und Pop-up-Fenstern: assets/x.svg (Feather „x“) als Maske in der
+   Textfarbe des Knopfs (wie die Symbole in Rückmeldungen), damit es genau mittig sitzt (das Zeichen
+   „×“ liegt je nach Schrift etwas zu tief). Das Zeichen bleibt im HTML, wird aber ausgeblendet
+   (font-size: 0), vorgelesen wird das aria-label des Knopfs. */
+.msg-x, .modal-close { font-size: 0; }
+.msg-x::before, .modal-close::before {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 1rem; height: 1rem;
+  transform: translate(-50%, -50%);
+  background-color: currentColor; mask: url("../assets/x.svg") no-repeat center / contain;
+}

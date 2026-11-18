@@ -1,0 +1,66 @@
+/* ---- symbole in rückmeldungen ---- */
+
+.lex-result .lex-msg-text, .lex-hinweis-text, .robot-ue-result, .cw-leiste-text, .rueckfrage .cw-wechsel-text {
+  --symbol-groesse: 1.25em;
+  position: relative;
+  padding-left: calc(var(--symbol-groesse) + var(--gap-m));
+}
+.lex-result .lex-msg-text::before, .robot-ue-result::before,
+.cw-leiste-text::before, .pb-msg.pb-ok::before, .pb-msg.pb-err::before,
+.rueckfrage .cw-wechsel-text::before {
+  content: '';
+  width: var(--symbol-groesse); height: var(--symbol-groesse);
+  mask: no-repeat center / contain;
+}
+.lex-result .lex-msg-text::before, .cw-leiste-text::before, .rueckfrage .cw-wechsel-text::before {
+  position: absolute; left: 0; top: calc((1lh - var(--symbol-groesse)) / 2);
+}
+/* .robot-ue-result trägt Text und Innenabstand selbst: Symbol innerhalb des Innenabstands */
+.robot-ue-result { padding-left: calc(16px + var(--symbol-groesse) + var(--gap-m)); }
+.robot-ue-result::before {
+  position: absolute; left: 16px; top: calc(14px + (1lh - var(--symbol-groesse)) / 2);
+}
+/* Mit Titel (Codegenerierung, Lexik): Symbol und Titel stehen in der ersten Zeile, alles darunter (Satz, Knopf,
+   Hinweis) beginnt ganz links. Nur der Titel rückt für das Symbol ein. */
+.robot-ue-result:has(> .meldung-titel) { padding-left: 16px; }
+.robot-ue-result > .meldung-titel,
+.lex-result .lex-msg-text > .meldung-titel { padding-left: calc(var(--symbol-groesse) + var(--gap-m)); }
+.lex-result .lex-msg-text:has(> .meldung-titel) { padding-left: 0; }
+/* Dasselbe in der Leiste von Quiz und Diagramm 1.3 */
+.cw-leiste-text:has(> .meldung-titel) { padding-left: 0; }
+.cw-leiste-text > .meldung-titel { padding-left: calc(var(--symbol-groesse) + var(--gap-m)); }
+/* Syntax und Semantik: Symbol und Titel („Falsch“, „Geschafft“) stehen in der ersten Zeile, der Satz darunter, der Knopf
+   und der Hinweis beginnen ganz links (über beide Spalten) */
+.pb-msg.pb-ok, .pb-msg.pb-err {
+  --symbol-groesse: 1.25em;
+  display: grid; grid-template-columns: auto 1fr; column-gap: var(--gap-m); align-content: center;
+}
+.pb-msg.pb-ok::before, .pb-msg.pb-err::before {
+  grid-column: 1; grid-row: 1; align-self: start;
+  margin-top: calc((1lh - var(--symbol-groesse)) / 2);
+}
+.pb-msg.pb-ok > .pb-kind, .pb-msg.pb-err > .pb-kind { grid-column: 2; grid-row: 1; }
+.pb-msg.pb-ok > .pb-text, .pb-msg.pb-err > .pb-text { grid-column: 1 / -1; grid-row: 2; }
+
+/* Richtig */
+.lex-result.lex-ok .lex-msg-text::before, .robot-ue-result.robot-ue-ok::before,
+.cw-leiste.cw-ok .cw-leiste-text::before, .pb-msg.pb-ok::before {
+  mask-image: url("../assets/check-circle.svg"); background-color: var(--meldung-erfolg-titel);
+}
+/* Hinweis: die orangen Meldungen (Lexik, Syntax, Semantik, Codegenerierung). Der aufgeklappte
+   Hinweistext der Lexik steht in derselben Meldung, er bekommt kein zweites Symbol, sondern
+   rückt nur bündig unter den Text darüber ein. */
+.lex-result.lex-err .lex-msg-text::before, .pb-msg.pb-err::before,
+.robot-ue-result.robot-ue-hinweis::before, .cw-leiste.cw-hinweis .cw-leiste-text::before {
+  mask-image: url("../assets/info.svg"); background-color: var(--meldung-hinweis-titel);
+}
+/* Warnung vor dem Löschen (Rückfrage in den Einstellungen): gelb wie der Hinweis, aber mit
+   Warndreieck wie der Import-Hinweis in der Hilfe zum Hauptmenü (WARN_ICON in app.js) */
+.rueckfrage .cw-wechsel-text::before {
+  mask-image: url("../assets/warning-triangle.svg"); background-color: var(--meldung-hinweis-titel);
+}
+/* Fehler: die roten Meldungen (Laufzeitfehler, Fehler im Quellcode) */
+.robot-ue-result.robot-ue-err::before {
+  mask-image: url("../assets/warning-triangle.svg"); background-color: var(--fehler-stark);
+}
+

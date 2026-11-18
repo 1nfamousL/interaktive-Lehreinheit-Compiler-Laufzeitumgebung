@@ -1,0 +1,71 @@
+/* ---- kapitelübersicht: mindmap ---- */
+/* Der Container gibt der Karte ihre Größe (sie passt sich per fit() in js/mindmap.js an ihn an).
+   Er hat kein eigenes Fenster (Rand, Rundung, Fläche) mehr. Damit der Rand um die Schrift (.halo)
+   keinen Saum zeigt, ist #app auf dieser Ansicht einfarbig (--app-oben statt Verlauf), genau die
+   Farbe des Rands. Ist die Karte bei ihrer kleinsten Größe noch größer als der Container,
+   scrollt er. */
+.mindmap-host {
+  flex: 1 1 0;
+  min-height: 20rem;
+  display: flex;
+  overflow: auto;
+  /* Negative Außenabstände holen den größten Teil von Innenabstand und Gap von #app zurück: die Karte
+     reicht fast bis an den Rahmen und fast bis an die Kopfleiste (4px bzw. 6px bleiben stehen). */
+  margin: calc(-1 * var(--gap-m)) calc(-0.6 * var(--pad-l)) calc(-0.6 * var(--pad-l));
+}
+#app:has(.mindmap-host) { background: var(--mindmap-flaeche); }
+/* Alle Regeln der Karte hängen an svg.mindmap (setzt js/mindmap.js), damit nichts nach außen wirkt.
+   Schriftgrößen stehen als Attribute im SVG und gelten im Koordinatenraum der Karte, nicht in
+   der Skala --fs-*. */
+/* touch-action: none: Zoomen (zwei Finger) und Verschieben (ein Finger) macht js/mindmap.js selbst */
+svg.mindmap { display: block; flex: none; margin: auto; touch-action: none; }
+.mindmap text { pointer-events: none; user-select: none; dominant-baseline: central; }
+
+/* Knoten und Linien existieren dauerhaft. Ausgeschaltete Begriffe sind unsichtbar, ihr Platz bleibt frei. */
+.mindmap .n { opacity: 0; transform-origin: 0 0; transition: transform .12s ease-out, opacity .18s ease; }
+.mindmap .n.vis { opacity: 1; }
+.mindmap .n.vis.dim { opacity: .4; }
+.mindmap .lk { fill: none; stroke: var(--mindmap-linie); opacity: 0; transition: opacity .18s ease, stroke .15s; }
+.mindmap .lk.vis { opacity: 1; }
+.mindmap .lk.vis.dim { opacity: .35; }
+.mindmap .lk.on { stroke: var(--mindmap-linie-an); }
+
+.mindmap .halo { paint-order: stroke; stroke: var(--mindmap-flaeche); stroke-width: 4px; stroke-linejoin: round; }
+.mindmap .main { transition: fill .15s; }
+
+/* Wurzel */
+.mindmap .rootbg { fill: var(--mindmap-wurzel); }
+.mindmap .roottxt { fill: var(--mindmap-wurzel-text); }
+
+/* Ebene 1: gefüllte Pille */
+.mindmap .l1 .bg { fill: var(--mindmap-ast); transition: fill .15s; }
+.mindmap .l1 .main { fill: var(--mindmap-ast-text); }
+.mindmap .l1.hov .bg, .mindmap .l1.path .bg, .mindmap .l1.kid .bg { fill: var(--mindmap-ast-hover); }
+
+/* Ebene 2: Pille mit Kontur */
+.mindmap .l2 .bg { fill: var(--mindmap-zweig); stroke: var(--mindmap-zweig-rand); stroke-width: 1.5; transition: fill .15s, stroke .15s; }
+.mindmap .l2 .main { fill: var(--mindmap-text); }
+.mindmap .l2.path .bg { stroke: var(--mindmap-zweig-rand-pfad); }
+.mindmap .l2.kid .bg { stroke: var(--mindmap-zweig-rand-kid); }
+.mindmap .l2.hov .bg { fill: var(--mindmap-zweig-hover); stroke: var(--mindmap-text); }
+
+/* Ebene 3: Text auf Unterstreichung */
+.mindmap .l3 .ul { stroke: var(--mindmap-zweig-rand); stroke-width: 1.5; transition: stroke .15s; }
+.mindmap .l3 .main { fill: var(--mindmap-text-2); }
+.mindmap .l3.path .ul, .mindmap .l3.kid .ul { stroke: var(--mindmap-zweig-rand-pfad); }
+.mindmap .l3.path .main, .mindmap .l3.kid .main { fill: var(--mindmap-text); }
+.mindmap .l3.hov .main { fill: var(--mindmap-text); }
+.mindmap .l3.hov .ul { stroke: var(--mindmap-text); }
+
+/* Blätter: nur Text, Unterstreichung beim Fokus */
+.mindmap .lf .ul { stroke: var(--mindmap-text); stroke-width: 1; opacity: 0; transition: opacity .15s; }
+.mindmap .lf .main { fill: var(--mindmap-text-3); }
+.mindmap .lf.kid .main { fill: var(--mindmap-text-kid); }
+.mindmap .lf.path .main { fill: var(--mindmap-text); }
+.mindmap .lf.hov .main { fill: var(--mindmap-text); }
+.mindmap .lf.hov .ul { opacity: 1; }
+
+/* Neu freigeschaltet, noch nicht angeklickt */
+.mindmap .dot { fill: var(--mindmap-neu); opacity: 0; }
+.mindmap .isnew .dot { opacity: 1; }
+

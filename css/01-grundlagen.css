@@ -1,0 +1,340 @@
+/* stylesheet */
+
+/* ---- grundlagen: farben, schriftgrößen und abstände ---- */
+:root {
+  /* Die Seite ist dunkel: Der Browser zeigt seine eigenen Bedienelemente (Scrollleisten,
+     Auswahllisten, Eingabefelder ohne eigenes Styling) ebenfalls in der dunklen Variante. */
+  color-scheme: dark;
+  /* Scrollleisten: Schieber im hellen Grau der App, Bahn durchsichtig (Firefox, Chrome und Edge
+     ab Version 121; Safari zeigt die dunkle Standardleiste). Wird an alle Elemente vererbt. */
+  scrollbar-color: var(--text-dim) transparent;
+  /* ---- farben ---- */
+  /* Flächen */
+  --bg: #0a0d12;
+  --bg-verlauf: #10141b;        /* unteres Ende des Verlaufs im Rahmen #app */
+  --panel: #141921;
+  --panel-2: #1b222c;
+  --panel-hover: #222a37;
+  --overlay: #05080c;           /* abgedunkelter Hintergrund hinter Pop-ups */
+  --verbinder: #3b4a5f;         /* Verbindungslinie zwischen Folien */
+  --spielfeld: var(--bg);       /* Fugen zwischen den Feldern des Roboter-Rasters */
+  --app-oben: var(--panel);     /* oberes Ende des Verlaufs im Rahmen #app */
+  --feld: var(--bg);            /* Felder in der CPU-Karte (Befehlszähler, Befehlsregister, Rechenwerk) */
+  --fach: var(--bg);            /* Fächer in Datenspeicher, Register und Flag */
+
+  /* Schrift */
+  --text: #eaeff6;
+  --text-dim: #9aa8bb;
+  --muted: #7c8798;
+  --text-auf-farbe: #101317;    /* dunkle Schrift auf farbigen Flächen (Bausteine, Badges) */
+  --weiss: #ffffff;             /* Schrift auf Akzent- und Fehlerflächen, Linien in Grafiken */
+  --aufhellung: #ffffff;        /* durchsichtig über Flächen gelegt (Hover, Eingabefelder) */
+  --schatten: #000000;
+
+  /* Rahmen */
+  --border: #2d3846;
+  --border-hover: #44546a;
+  --feld-rand: var(--border);   /* Rand von --feld und --fach */
+
+  /* Akzent und Knöpfe */
+  --accent: #486aee;
+  --accent-text: #6b8cff;      /* helleres Blau für Text, dünne Linien und Ringe auf Dunkel
+                                   (5,4 : 1 auf --panel); --accent bleibt für Flächen mit weißer Schrift */
+  --primary: #eef1f5;           /* heller Hauptknopf im Menü */
+  --primary-text: #101317;      /* Schrift auf dem Hauptknopf */
+  --primary-hover: #ffffff;
+  --hover-ton: #ffffff;         /* durchsichtig über Flächen gelegt beim Überfahren */
+  --linie-grafik: #ffffff;      /* Linien und Pfeile in Grafiken */
+  --fortschritt: var(--abgeschlossen);  /* Fortschrittsbalken in der Kapitelübersicht, zählt abgeschlossene Lektionen, daher deren Grün */
+  --fortschritt-spur: var(--border-hover);
+  --kapitelnummer: var(--accent-text);  /* "2.3" im Kopf der Lektion ("Kapitel n" in der Übersicht nimmt --abgeschlossen) */
+  /* abgeschlossene Lektionen, Kapitel-Haken und Fortschrittsbalken: Blau wie die Schrift
+     "Kapitel n" (--accent-text, für dünne Linien auf Dunkel) */
+  --abgeschlossen: var(--accent-text);
+
+  /* Status */
+  --ok: #3ddc6a;
+  --warn: #ffa63d;
+  --fehler-baum: #ff7b7b;       /* Syntax- und Semantikbaum, Drag-and-drop-Diagramm */
+  --fehler-knopf: #ef4444;      /* Fehlerknöpfe und Fehlerfläche (Kapitel 2 bis 6) */
+  --fehler-stark: #e8284f;      /* Laufzeitfehler, fehlerhafte Bausteine */
+  --fehler-flaeche: #341214;    /* Hintergrund der Laufzeitfehler-Meldung */
+  /* Meldungen (Erfolg grün, Hinweis an den Spieler orange): Fläche, Rand und Titel. Auf Dunkel
+     12 % Statusfarbe über --panel, das helle Schema setzt eigene deckende Werte. */
+  --meldung-erfolg: color-mix(in srgb, var(--ok) 12%, var(--panel));
+  --meldung-erfolg-rand: var(--ok);
+  --meldung-erfolg-titel: var(--ok);
+  --meldung-hinweis: color-mix(in srgb, var(--warn) 12%, var(--panel));
+  --meldung-hinweis-rand: var(--warn);
+  --meldung-hinweis-titel: var(--warn);
+
+  /* Markierungen im Laufzeitsystem */
+  --markierung-lesen: #60a5fa;
+  --markierung-schreiben: #f5e08a;
+  --markierung-sprung: #93c5fd;
+
+  /* Befehlsgruppen der Bausteine: Fläche und Symbol. Gleich in beiden Schemata */
+  --befehl-mov: #d8b4fe;
+  --befehl-bewegung: #3ddc6a;   /* eigene Rolle, damit die Fläche nicht mit --ok dunkler wird */
+  --befehl-mov-symbol: #7e22ce;
+  --befehl-bewegung-symbol: #15803d;
+  --befehl-rechnen: #fcd34d;
+  --befehl-rechnen-symbol: #b45309;
+  --befehl-vergleich: #fdba74;
+  --befehl-vergleich-symbol: #c2410c;
+  --befehl-sprung: #93c5fd;
+  --befehl-sprung-symbol: #1d4ed8;
+  --befehl-end: #c5d0df;
+  --befehl-end-symbol: #66789a;
+  --befehl-end-text: #3a4a63;
+  /* Eingabefelder in den Bausteinen */
+  --feld-speicher: #bfe9e1;
+  --feld-zeile: #dbe7ff;
+
+  /* Token-Kategorien (Lexik, Syntax): --c-* Farbe im Werkzeug-Knopf, --hl-* hellere
+     Variante im Code */
+  --c-identifier: #c58bff; --hl-identifier: #d8b4fe;
+  --c-keyword: #4ade80;    --hl-keyword: #86efac;
+  --c-literal: #6aa9ff;    --hl-literal: #93c5fd;
+  --c-operator: #fb923c;   --hl-operator: #fdba74;
+  --c-separator: #facc15;  --hl-separator: #fde68a;
+  --c-error: #f05252;      --hl-error: #fca5a5;
+  --c-literal-text: var(--c-literal);  /* Literal als Schriftfarbe (Semantik), eigene Rolle für Rot-Grün hell */
+  /* Schrift auf den Markierungen. Normal überall dunkel, eigene Rollen, damit dunkle
+     Markierungen (Rot-Grün) weiße Schrift bekommen können */
+  --hl-identifier-text: var(--papier-text);  --hl-keyword-text: var(--papier-text);
+  --hl-literal-text: var(--papier-text);     --hl-operator-text: var(--papier-text);
+  --hl-separator-text: var(--papier-text);   --hl-error-text: var(--papier-text);
+  --farbmuster-rand: transparent;  /* feiner Rand um die Farbmuster der Lexik-Werkzeuge (Rot-Grün) */
+  --lex-leer: #9ca3af;         /* Leerzeichen und Zeilenumbrüche im Lexik-Feld */
+
+  /* "Papier": die hellen Code-Fenster (Quellcode, Lexik-Feld, Eingabe) */
+  --papier: #f4f2e9;
+  --papier-text: #1e232b;
+  --papier-dim: #8a8577;
+  --papier-platzhalter: #9a9585;
+  /* Quellcode: im Lektionstext (.code-papier), im Lexik-Feld (.lex-code), im Codegenerierungs-Fenster
+     (.cg-source) und im Eingabefeld von Kapitel 6 (.cw-eingabe). Hellblau (wie im Editor) auf dem
+     Hintergrund des Rahmens #app, in dem die Folie liegt. Auf Hell dasselbe wie das Papier. */
+  --quelltext-bg: var(--bg-verlauf);
+  --quelltext-text: #9cdcfe;
+
+  /* Titel im Hauptmenü und Terminal-Zeile: Compile Time blau, Run Time gelb */
+  --compile: #93a1ff;
+  --run: #ecbd72;
+  --tp-gruen: #7fd6b4;
+  --tp-pfad: #9ba4b2;
+
+  /* Mindmap (Kapitelübersicht): nur aus vorhandenen Rollen gemischt, deshalb gelten sie in beiden
+     Schemata ohne eigenen Wert im hellen Block (--primary & Co. wechseln dort selbst).
+     Fläche ist zugleich der Rand um die Schrift (.halo), beide müssen dieselbe Farbe sein. Es gibt
+     kein eigenes Fenster mehr, die Karte liegt direkt auf #app (dort flach in --app-oben, siehe
+     #app:has(.mindmap-host)). */
+  --mindmap-flaeche: var(--app-oben);
+  --mindmap-linie: var(--border-hover);
+  --mindmap-linie-an: var(--text-dim);
+  --mindmap-wurzel: var(--primary);
+  --mindmap-wurzel-text: var(--primary-text);
+  --mindmap-ast: color-mix(in srgb, var(--primary) 82%, var(--panel));   /* Ebene 1 */
+  --mindmap-ast-hover: var(--primary-hover);
+  --mindmap-ast-text: var(--primary-text);
+  --mindmap-zweig: var(--panel-2);                                       /* Ebene 2 */
+  --mindmap-zweig-hover: var(--panel-hover);
+  --mindmap-zweig-rand: var(--border-hover);
+  --mindmap-zweig-rand-kid: var(--muted);
+  --mindmap-zweig-rand-pfad: var(--text-dim);
+  --mindmap-text: var(--text);
+  --mindmap-text-2: color-mix(in srgb, var(--text) 82%, var(--panel));   /* Ebene 3 */
+  --mindmap-text-3: color-mix(in srgb, var(--text) 72%, var(--panel));   /* Blätter */
+  --mindmap-text-kid: color-mix(in srgb, var(--text) 92%, var(--panel));
+  --mindmap-neu: var(--accent-text);                                     /* Punkt "neu" */
+
+  /* Karten der Phasen-Zuordnung (Lektion 6.1): Ergebnis, Kernaufgabe, Fehler. Aus den Token-Farben
+     gewählt, weil die für Rot-Grün-Schwäche eigene Werte haben. Jede Karte trägt zusätzlich ein
+     Etikett, die Farbe ist also nie das einzige Merkmal. */
+  --pz-ergebnis: var(--c-literal);
+  --pz-aufgabe: var(--c-keyword);
+  --pz-fehler: var(--c-error);  /* Rot wie die lexikalischen Fehler; Orange ist bei uns der Hinweis (--warn) */
+  /* Schriftfarbe des Etiketts auf der Karte: gleich der Kartenfarbe, nur im hellen Rot-Grün-Modus
+     dunkler (siehe dort), weil Flieder und Limette als Schrift auf Hell zu blass sind. */
+  --pz-ergebnis-text: var(--pz-ergebnis);
+  --pz-aufgabe-text: var(--pz-aufgabe);
+  --pz-fehler-text: var(--pz-fehler);
+
+  /* Einzelne Grafiken */
+  --mt-pfeil: #c3a8b8;
+  --badge-machen: #6c9ee0;      /* Lektion 1.1 und 1.2 */
+  --badge-sachen: #7fe0c0;
+  /* Pfeil der Auswahlliste .lz-speed: Bild als Daten-URL, darin wirkt var() nicht. Die Farbe
+     (%23 = #) ist deshalb von Hand die Schriftfarbe --text des Schemas. */
+  --lz-pfeil: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='%23eaeff6' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E");
+  --mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  /* Schriftgrößen, fünf Stufen in rem. Die Grundschrift setzt html in 02-basis.css (16px bei
+     1440px Fensterbreite), die px-Angaben unten gelten für diese 16px. Zeichen in Grafiken
+     (Pfeile, "×", Lexer-Feld) stehen bewusst nicht hier, sondern bleiben feste px-Werte.
+     Der Menütitel hat mit --mt-schrift (03-menue.css) eine eigene Größe in rem. */
+  --fs-xs: 0.75rem;     /* 12px: Mini-Labels */
+  --fs-s: 0.875rem;     /* 14px: Hinweise, Nebentexte */
+  --fs-m: 0.9375rem;    /* 15px: Karten, Chips, Oberfläche */
+  --fs-l: 1.0625rem;    /* 17px: Folientext */
+  --fs-xl: 1.375rem;    /* 22px: Überschriften */
+  /* Diese Abstandsvariablen stehen in rem und wachsen mit der Grundschrift (html, clamp);
+     feste px-Abstände im übrigen CSS bleiben vorerst px.
+  Innenabstände: --pad-l für den Rahmen um den Screen (#app) und die Fenster in Kapitel 2 bis 6,
+     --pad-xl für die Folie (.slide). */
+  --pad-l: 0.9375rem;   /* 15px */
+  --pad-xl: 1.25rem;    /* 20px */
+  /* Abstand zwischen der Überschrift eines Fensters und dem Inhalt darunter, genutzt in den
+     Phasenübungen, der Roboter-Übung 1.1 und dem Modell in 1.2. */
+  --abstand-titel: 0.625rem;   /* 10px */
+  /* Abstand zwischen nebeneinander oder untereinander stehenden Elementen (gap, Außenabstand), genutzt in den
+     Phasenübungen, der Roboter-Übung 1.1 und dem Modell in 1.2. */
+  --gap-l: 0.9375rem;   /* 15px */
+  /* Kleinerer Abstand innerhalb einer Gruppe, z. B. zwischen den Nichtterminalen */
+  --gap-m: 0.625rem;    /* 10px */
+  /* Eckenradien, vier Stufen. Ein Element in einem Fenster hat höchstens den Radius seines
+     Fensters. Ausnahmen: 999px (Pillen), 50% (Kreise), 0 und die eckige .memory-box. */
+  --r-s: 6px;    /* Chips, Bausteine, kleine Felder */
+  --r-m: 10px;   /* Knöpfe, Eingabefelder, Karten in Fenstern */
+  --r-l: 14px;   /* Fenster, Panels, Lektionskarten, Modal */
+  --r-xl: 20px;  /* Folie und äußerer Rahmen (#app) */
+}
+
+/* ---- helles schema ---- */
+/* Aktiv mit data-theme="light" am <html> (Skript im <head> von index.html, Umschalter in den
+   Einstellungen). Nur Farbwerte, am Layout ändert sich nichts. Variablen, die hier fehlen,
+   behalten ihren Wert aus dem dunklen Schema. */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  /* Blau-Skala, von hell (1) nach dunkel (12). Flächen, Rahmen und dunkle Töne des hellen
+     Schemas zeigen auf eine Stufe statt auf eigene Werte, so bleiben die Abstände überall gleich
+     und das Schema lässt sich an einer Stelle umfärben. */
+  --blau-1: #f6fafe;  --blau-2: #ebf4fd;  --blau-3: #d8e6f5;  --blau-4: #c0d3e9;
+  --blau-5: #b2c8e2;  --blau-6: #97b2d0;  --blau-7: #6690c6;  --blau-8: #4a6a94;
+  --blau-9: #3d5f8f;  --blau-10: #2f4f80; --blau-11: #213a66; --blau-12: #14284a;
+
+  --bg: var(--blau-6);
+  --app-oben: var(--blau-4);  --bg-verlauf: var(--blau-5);  /* Rahmen #app, dunkler als die Fenster darin */
+  --spielfeld: var(--app-oben);  /* Raster: Farbe des App-Rahmens statt der Seite außen */
+  --panel: var(--blau-3);  --panel-2: var(--blau-2);  --panel-hover: var(--blau-1);
+  --overlay: var(--blau-12);  --verbinder: var(--blau-6);
+
+  --text: #0f1f35;  --text-dim: #3a5069;
+  --muted: #51698a;
+  --schatten: var(--blau-12);
+
+  --border: var(--blau-6);  --border-hover: var(--blau-7);
+
+  --accent: #3b5fe0;  --accent-text: #2a49c9;
+  --primary: var(--blau-12);  --primary-text: var(--weiss);  --primary-hover: var(--blau-11);
+  --hover-ton: var(--blau-12);  --linie-grafik: var(--blau-9);
+
+  /* Felder in der CPU-Karte, Fächer im Datenspeicher, Fortschritt, Kapitelnummer */
+  --feld: var(--blau-1);  --feld-rand: var(--blau-8);  --fach: var(--feld);
+  --fortschritt: var(--abgeschlossen);  --fortschritt-spur: var(--blau-6);
+  --kapitelnummer: var(--blau-9);
+  --abgeschlossen: var(--kapitelnummer);  /* Fortschritt (Kapitel, Karten, Haken, Balken) wie der Lektionstitel im Folienkopf */
+
+  /* Zwei Rottöne: einer für "falsch" (Bäume, Knöpfe, Lexik, Token), ein kräftigerer für Laufzeitfehler */
+  --ok: #16a34a;  --warn: #b45309;
+  --fehler-knopf: #dc2626;  --fehler-stark: #d81b43;
+  --fehler-baum: var(--fehler-knopf);
+  --fehler-flaeche: #fde8e8;
+
+  --markierung-lesen: #2563eb;
+  --markierung-schreiben: #efd05a;
+  --markierung-sprung: #1d4ed8;
+
+  /* --hl-* sind Flächen mit dunkler Schrift (Markierungen im Code), bleiben deshalb hell wie im Dark */
+  --c-identifier: #9333ea;
+  --c-keyword: #16a34a;
+  --c-literal: #2563eb;
+  --c-operator: #ea580c;
+  --c-separator: #ca8a04;
+  --c-error: var(--fehler-knopf);
+  --lex-leer: var(--blau-6);
+
+  /* Code-Fenster weiß, die Grautöne darin aus der Blau-Skala statt warmem Grau */
+  --papier: var(--weiss);  --papier-text: var(--text);
+  --papier-dim: var(--muted);  --papier-platzhalter: var(--blau-7);
+  --quelltext-bg: var(--papier);  --quelltext-text: var(--papier-text);
+
+  --compile: var(--accent);  --run: #b7791f;
+  --tp-gruen: #0d9488;  --tp-pfad: var(--text-dim);
+  --mt-pfeil: #a07d90;
+  --badge-machen: #7fb0ec;  --badge-sachen: #6fd1b0;
+
+  /* Meldungen deckend hell (die durchsichtige Tönung über dem Blau wurde matschig) */
+  --meldung-erfolg: #e4f6ea;  --meldung-erfolg-rand: var(--ok);  --meldung-erfolg-titel: #15803d;
+  --meldung-hinweis: #fff1e0;  --meldung-hinweis-rand: #d9730d;  --meldung-hinweis-titel: var(--warn);
+
+  --lz-pfeil: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='%230f1f35' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E");
+}
+
+/* ---- farbsicht rot-grün ---- */
+/* Aktiv mit data-farbsicht="rot-gruen" am <html> (Skript im <head> von index.html, Umschalter in
+   den Einstellungen). Gilt für Deuteranopie und Protanopie: dort fallen Rot, Orange, Grün und Gelb
+   zusammen, übrig bleibt die Achse Blau ↔ Gelb plus Helligkeit. Deshalb richtig = Blau,
+   falsch = Zinnober, Hinweis = Gelb (Okabe-Ito). Nur Rollen, die sonst kollidieren, alle anderen
+   behalten ihren Wert aus dem jeweiligen Schema.
+   Token und Bausteine sind nachgerechnet (Chrome-Simulation nach Machado 2009, Abstand in OKLab):
+   pro Gruppe je zwei Blau- und Gelbtöne, dazu Neutral und Weiß, getrennt über die Helligkeit.
+   Mehr als etwa sechs helle Flächen lassen sich so nicht klar trennen, Token brauchen deshalb
+   zusätzlich ein zweites Merkmal (Linie, Muster). Die Token-Farben sind vorgegeben, nicht
+   errechnet, liegen aber bei mindestens ~14. Token und Bausteine gelten für Hell und Dunkel
+   gleich, der helle Block unten ändert nur Status, Meldungen und Literal als Schrift. */
+:root[data-farbsicht="rot-gruen"] {
+  --ok: #56b4e9;  --warn: #f0e442;
+  --fehler-knopf: #f0e442;  --fehler-stark: #f0e442;
+  --fehler-baum: #ff9a5c;
+  --fehler-flaeche: #3a1e0e;
+
+  /* Token: ein Satz für Farbmuster (--c-*) und Markierung im Code (--hl-*), damit beide gleich
+     aussehen, in Hell und Dunkel. Sechs vorgegebene Farben: Bezeichner Violettblau,
+     Schlüsselwort Grün, Literal Flieder, Operator Graugrün, Gliederung Schiefer, Fehler Limette.
+     Die drei dunklen bekommen weiße Schrift auf der Markierung. Die Farbmuster im Knopf
+     bekommen einen feinen Rand, weil die hellen auf Hell und die dunklen auf Dunkel sonst
+     verschwinden. */
+  --c-identifier: #5e00e4; --hl-identifier: #5e00e4; --hl-identifier-text: var(--weiss);
+  --c-keyword: #278600;    --hl-keyword: #278600;    --hl-keyword-text: var(--weiss);
+  --c-literal: #99a1ff;    --hl-literal: #99a1ff;
+  --c-operator: #b5d4c1;   --hl-operator: #b5d4c1;
+  --c-separator: #324a56;  --hl-separator: #324a56;  --hl-separator-text: var(--weiss);
+  --c-error: #adff0e;      --hl-error: #adff0e;
+  --farbmuster-rand: color-mix(in srgb, var(--text) 35%, transparent);
+
+  /* Karten der Phasen-Zuordnung (6.1): Kernaufgabe in der Farbe von Literal (Flieder). Die Fehlerkarte
+     folgt wie überall --c-error (hier Limette). Eingabe / Ausgabe zieht auf das frei gewordene Grün des
+     Schlüsselworts um, sonst hätte es dieselbe Farbe wie die Kernaufgabe. */
+  --pz-ergebnis: var(--c-keyword);
+  --pz-aufgabe: var(--c-literal);
+
+  /* Bausteine: mov Hellblau, Sprung kräftiges Blau, Bewegung fast Weiß (Mint), Rechnen Gelb,
+     Vergleich Ocker, end Grau. Vorher waren mov und Sprung in der Simulation gleich. */
+  --befehl-mov: #a6d6ff;        --befehl-mov-symbol: #1a5a9a;
+  --befehl-sprung: #7590f5;     --befehl-sprung-symbol: #142a8a;
+  --befehl-bewegung: #dafbe4;   --befehl-bewegung-symbol: #1f6b4a;
+  --befehl-rechnen: #f4e660;    --befehl-rechnen-symbol: #7a5e00;
+  --befehl-vergleich: #d39c2c;  --befehl-vergleich-symbol: #5a3a00;
+  --befehl-end: #9b9c9f;        --befehl-end-text: #23272e;
+}
+
+/* Rot-Grün im hellen Schema. Steht nach dem Block oben und ist spezifischer, gewinnt also.
+   Token und Bausteine erben die Werte von oben. Hier stehen nur Farben, die als Schrift oder
+   dünne Linie auf hellem Grund dunkler sein müssen, und die Meldungen (im hellen Schema feste
+   Werte statt color-mix). */
+:root[data-theme="light"][data-farbsicht="rot-gruen"] {
+  --ok: #0072b2;  --warn: #8a6a00;
+  --fehler-knopf: #d55e00;  --fehler-stark: #c85200;
+  --fehler-baum: var(--fehler-knopf);
+  --fehler-flaeche: #fbe6da;
+
+  --c-literal-text: #4b52c8;  /* Flieder ist auf Hell als Schrift zu blass */
+  --pz-aufgabe-text: var(--c-literal-text);
+  --pz-fehler-text: #4a6a00;  /* Limette ist auf Hell als Schrift zu blass, dunkles Olivgrün */
+
+  --meldung-erfolg: #e3f0fa;  --meldung-erfolg-titel: #005a8c;
+  --meldung-hinweis: #fff6d6;  --meldung-hinweis-rand: #b08800;  --meldung-hinweis-titel: var(--warn);
+}
+

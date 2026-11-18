@@ -1,0 +1,250 @@
+/* ---- syntax (compiler-weg-syntax.js) ---- */
+/* Aufbau wie die Lexer-Übung: links Baum mit Meldung darunter, rechts eine
+   Seitenleiste mit allem, was man ziehen oder anklicken kann. Nichtterminale
+   sind Pillen, Terminale Rechtecke in Monospace, gefärbt wie in der
+   Scanner-Übung.
+   Bewusst feste Größen, damit nichts springt, wenn das Token wechselt oder
+   eine Meldung erscheint. */
+/* Das <div>, in das app.js die Übung rendert, ist ein Flex-Kind von .slide
+   und wäre sonst so breit wie sein Inhalt, also so breit wie der ganze Baum
+   (.pb-tree ist width: max-content). Dann würde die Seitenleiste aus der
+   Folie herausgeschoben, und der Baum käme nie ans Scrollen. Mit voller
+   Breite und min-width: 0 bleibt es bei der Breite der Folie, und nur
+   .pb-tree-scroll scrollt. */
+.slide > div:has(> .pb-stage) { width: 100%; min-width: 0; }
+.pb-stage { display: flex; gap: 22px; flex-wrap: wrap; align-items: flex-start; }
+.pb-main { flex: 1; min-width: 21.25rem; display: flex; flex-direction: column; gap: 14px; }
+.pb-label { font-size: var(--fs-xs); font-weight: 600; color: var(--text-dim); }
+
+.pb-sidebar { width: 21.25rem; flex: none; display: flex; flex-direction: column; gap: 14px; }
+.pb-card { background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--r-l); }
+.pb-cell { display: flex; flex-direction: column; gap: 10px; padding: 16px 20px 18px; min-width: 0; }
+.pb-cell + .pb-cell { border-top: 1px solid var(--border); }
+
+.pb-tokens, .pb-tray { display: flex; align-items: center; }
+.pb-tokens { min-height: 3.625rem; }
+.pb-tray { flex-wrap: wrap; gap: 10px; align-content: center; }
+
+.pb-tok {
+  position: relative;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  min-width: 3em;
+  padding: 10px 20px;
+  border-radius: var(--r-s);
+  text-align: center;
+  color: var(--text);
+  border: 1.5px solid var(--text-dim);
+  background: var(--panel);
+}
+button.pb-tok { cursor: pointer; transition: box-shadow .12s; }
+/* Farbe nach Tokenkategorie, wie in der Scanner-Übung. Gilt für das aktuelle Token und für die
+   Blätter im Syntaxbaum; .pb-term.pb-cat-* hat mehr Gewicht als die graue Grundregel .pb-term weiter
+   unten. Die Kopie beim Ziehen (.pb-ghost) behält ihren blauen Rand. */
+.pb-cat-keyword, .pb-term.pb-cat-keyword { border-color: var(--c-keyword);    background: color-mix(in srgb, var(--c-keyword) 12%, var(--panel)); }
+.pb-cat-literal, .pb-term.pb-cat-literal { border-color: var(--c-literal);    background: color-mix(in srgb, var(--c-literal) 12%, var(--panel)); }
+.pb-cat-separator, .pb-term.pb-cat-separator { border-color: var(--c-separator);  background: color-mix(in srgb, var(--c-separator) 12%, var(--panel)); }
+.pb-cat-identifier, .pb-term.pb-cat-identifier { border-color: var(--c-identifier); background: color-mix(in srgb, var(--c-identifier) 12%, var(--panel)); }
+.pb-cat-operator, .pb-term.pb-cat-operator { border-color: var(--c-operator);   background: color-mix(in srgb, var(--c-operator) 12%, var(--panel)); }
+/* Aktuelles Token: bewusst ohne eigenen Ring. In der Seitenleiste steht nur ein Token, es trägt nur
+   die Farbe seiner Kategorie. Blau umrandet ist es erst, wenn es per Antippen ausgewählt ist (.sel). */
+.pb-tok.bad { border-color: var(--fehler-baum); background: color-mix(in srgb, var(--fehler-baum) 14%, transparent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--fehler-baum) 30%, transparent); }
+.pb-tok-end { color: var(--text-dim); font-size: var(--fs-l); font-style: italic; font-family: inherit; font-weight: 500; }
+span.pb-tok-end { padding: 10px 0; }
+
+/* Alles, was man ziehen oder antippen kann. touch-action: none verhindert,
+   dass der Browser beim Ziehen scrollt. */
+.pb-src { touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; }
+.pb-src:disabled { cursor: not-allowed; }
+.pb-src.dragging { opacity: .35; }
+/* Chips wie .dd-chip (Schrift, Farben, Abstände); nur die runde Pillenform
+   bleibt, weil sie im Baum die Nichtterminale kennzeichnet */
+/* Nichtterminale (Ablage und Baum) stehen GROSS, wie in der Grammatik. Nur die Darstellung:
+   Die Namen im Code (z. B. "Anweisung") bleiben unverändert. Großbuchstaben sind breiter,
+   deshalb eine Schriftstufe kleiner als vorher. */
+.pb-chip {
+  font: inherit;
+  font-size: var(--fs-s);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--text);
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  transition: border-color .12s;
+}
+.pb-chip:hover:not(:disabled) { border-color: var(--accent-text); }
+.pb-chip:disabled { opacity: .4; }
+.pb-chip.sel, .pb-tok.sel { border-color: var(--accent-text); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 40%, transparent); }
+
+/* Kopie am Zeiger: hängt an document.body, deshalb nicht unter .pb-stage */
+.pb-ghost {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  opacity: .94;
+  border-color: var(--accent-text);
+  box-shadow: 0 14px 34px -10px color-mix(in srgb, var(--schatten) 65%, transparent);
+  margin: 0;
+}
+.pb-stage.pb-dragging, .pb-stage.pb-dragging * { cursor: grabbing !important; }
+
+/* Syntaxfehler-Fläche: Klick meldet das aktuelle Token, Ablegen ebenfalls */
+.pb-errzone {
+  border: 1.5px dashed var(--warn);
+  color: var(--warn);
+  border-radius: var(--r-m);
+  min-height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 10px 20px;
+  font-size: var(--fs-m);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .12s;
+}
+.pb-errzone.armed, .pb-dragging .pb-errzone { background: color-mix(in srgb, var(--warn) 8%, transparent); }
+.pb-errzone.hot { background: color-mix(in srgb, var(--warn) 22%, transparent); border-style: solid; }
+.pb-errzone.off { opacity: .4; cursor: default; }
+/* Compiler-Weg (compiler-weg-syntax.js): rot, "Syntaxfehler melden", Größe wie die
+   Knöpfe "Zurücksetzen" und "Syntaxregeln" darunter */
+.pb-errzone-cw { border-width: 1px; border-color: var(--fehler-knopf); color: var(--fehler-knopf); min-height: 0; padding: 12px; }
+.pb-errzone-cw.armed, .pb-dragging .pb-errzone-cw { background: color-mix(in srgb, var(--fehler-knopf) 10%, transparent); }
+.pb-errzone-cw.hot { background: color-mix(in srgb, var(--fehler-knopf) 25%, transparent); }
+/* Hover wie bei den Fehlerknöpfen der Semantik (.sem-fehlerknopf) */
+.pb-errzone-cw:hover:not(.off):not(.hot) { background: color-mix(in srgb, var(--fehler-knopf) 12%, transparent); }
+
+.pb-canvas { background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--r-l); padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+/* Buttons wie die der anderen Übungen: "Zurücksetzen" wie .lex-btn-reset,
+   "Syntaxregeln" als Pop-up-Button, beide über die volle Breite der
+   Seitenleiste */
+.pb-btn-reset { width: 100%; padding: 0.75rem; border-radius: var(--r-m); background: transparent; border: 1px solid var(--border); color: var(--text); font: inherit; font-weight: 600; font-size: var(--fs-m); cursor: pointer; transition: .15s; }
+.pb-btn-reset:hover { background: var(--panel); }
+.pb-btn-regeln { width: 100%; padding: 0.8125rem; border-radius: var(--r-m); background: var(--panel); border: 1px solid var(--border); color: var(--text); font: inherit; font-weight: 600; font-size: var(--fs-m); cursor: pointer; transition: .15s; }
+/* Hover wie bei .btn (Hilfe, nächste Lektion …) */
+.pb-btn-regeln:hover { background: var(--panel-2); border-color: var(--border-hover); }
+
+/* Meldung unter dem Baum: der Platz bleibt immer reserviert, damit nichts
+   springt. Ohne Meldung ist die Fläche unsichtbar. Farben wie .lex-result. */
+.pb-msg { min-height: 4rem; padding: 10px 16px; border-radius: var(--r-l); border: 1px solid transparent; display: flex; flex-direction: column; justify-content: center; gap: 2px; font-size: var(--fs-l); line-height: 1.45; }
+.pb-kind { font-size: var(--fs-l); font-weight: 500; }
+.pb-msg.pb-err { border-color: var(--meldung-hinweis-rand); background: var(--meldung-hinweis); }
+.pb-msg.pb-err .pb-kind { color: var(--meldung-hinweis-titel); }
+.pb-msg.pb-ok { border-color: var(--meldung-erfolg-rand); background: var(--meldung-erfolg); }
+.pb-msg.pb-ok .pb-kind { color: var(--meldung-erfolg-titel); }
+
+/* Compiler-Weg (compiler-weg-syntax.js): Meldung liegt oben rechts im Baumfenster und
+   lässt sich mit dem X schließen. Deckender Hintergrund, weil der Baum darunter liegt. */
+.pb-canvas { position: relative; }
+.pb-canvas > .pb-msg { position: absolute; top: 12px; right: 12px; z-index: 5; min-height: 0; min-width: min(22rem, 90%); max-width: min(28.75rem, 90%); padding-right: 56px; box-shadow: 0 6px 20px color-mix(in srgb, var(--schatten) 35%, transparent); }
+.pb-canvas > .pb-msg:not(.pb-err):not(.pb-ok) { display: none; }
+/* Hinweis zur Meldung wie in der Lexik (Knopf "Zeige Hinweis", dann Text) */
+.pb-msg > .lex-btn-hinweis { grid-column: 1 / -1; grid-row: 3; justify-self: start; }
+/* Der Hinweis ist die dritte Zeile (nach Titel und Satz) über alle Spalten (auch unter Symbol und ×), bricht um und macht
+   die Meldung beim Aufklappen nicht breiter (width: 0). Knopf und Hinweis teilen sich die Zeile, weil der
+   Knopf beim Aufklappen verschwindet. */
+.pb-msg > .lex-hinweis-text { grid-column: 1 / -1; grid-row: 3; padding-left: 0; font-size: inherit; color: inherit; width: 0; min-width: 100%; }
+
+/* Baumfläche: gepunkteter Hintergrund, bei breiten Bäumen horizontal scrollbar */
+.pb-tree-scroll {
+  overflow-x: auto;
+  border-radius: var(--r-m);
+  min-height: 25rem;
+  background-image: radial-gradient(color-mix(in srgb, var(--text-dim) 28%, transparent) 1px, transparent 1px);
+  background-size: 1.125rem 1.125rem;
+}
+/* So breit wie der Inhalt, mindestens aber so breit wie die Fläche.
+   position: relative, weil die Linien (.pb-wires) absolut darüber liegen. */
+.pb-tree { position: relative; width: max-content; min-width: 100%; display: flex; justify-content: center; padding: 40px 28px; }
+.pb-wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.pb-wires path { fill: none; stroke: var(--text-dim); stroke-width: 1.5; stroke-linecap: round; }
+.pb-wires path.z { stroke: var(--accent-text); stroke-dasharray: 4 5; }
+/* Statische Abbildung im Lektionstext (js/baum-abbildung.js): kein Mindestmaß wie in der Übung,
+   die Fläche ist so groß wie der Baum */
+.pb-abbildung .pb-tree-scroll { min-height: 0; border-radius: 0; }
+/* Kein eigener Rand um den Baum: Er liegt direkt am Innenabstand der Karte, vor ihm liegt keine Reihe
+   und keine Spalte des Punktrasters. Ohne Rundung, damit Knoten in den Ecken nicht angeschnitten werden. */
+.pb-abbildung .pb-tree { padding: 0; }
+/* Abbildung "Der Lader" im Lektionstext (2.6) unter dem Text in vier Spalten: Maschinencode, Pfeil,
+   Programmspeicher und Datenspeicher nach dem Laden. Die Fenster sind schmaler als im Laufzeitsystem. */
+.lader-abbildung { --lz-feld: 3.25rem; display: flex; align-items: flex-start; gap: var(--gap-l); width: fit-content; }
+.lader-abbildung .lz-prog { width: 15rem; }
+.lader-abbildung .lader-daten .cg-mem-grid { grid-template-columns: var(--lz-feld); }
+.lader-pfeil { align-self: center; display: flex; flex-direction: column; align-items: center; font-size: 1.75rem; line-height: 1; color: var(--text-dim); }
+.lader-pfeil span { font-size: var(--fs-l); font-weight: 600; margin-bottom: 4px; }
+/* Abbildung abstrakter Syntaxbaum + Maschinencode im Lektionstext (2.5, Folie 4) untereinander */
+.codegen-abbildung { display: flex; flex-direction: column; align-items: flex-start; gap: var(--gap-l); }
+.codegen-abbildung .lz-prog { width: 23.75rem; }
+/* Die Programmfenster auf 2.5 Folie 3 und 2.6 Folie 2 sehen aus wie das Maschinencode-Fenster in der Übung (Kapitel 6, .cw-app,
+   dort gelten die Regeln nur im Container der Übung): Innenabstand --pad-l, Überschrift mit --abstand-titel über den Zeilen,
+   Zeilen mit --gap-m Abstand, Zeilennummer in Monospace mit --gap-l Abstand zum Baustein, Baustein mit --gap-m Innenabstand.
+   --abstand-titel und --gap-m sind gleich groß, deshalb trägt der Abstand der Spalte (gap) auch die Überschrift. */
+:is(.codegen-abbildung, .lader-abbildung) .lz-prog { display: flex; flex-direction: column; gap: var(--gap-m); padding: var(--pad-l); }
+:is(.codegen-abbildung, .lader-abbildung) .lz-prog > .robot-ref-title { margin: 0; text-box: trim-both cap alphabetic; }
+:is(.codegen-abbildung, .lader-abbildung) .lz-row { gap: var(--gap-l); padding: 0; }
+:is(.codegen-abbildung, .lader-abbildung) .robot-lineno { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; text-align: left; }
+:is(.codegen-abbildung, .lader-abbildung) .robot-mblock-placed { padding: var(--gap-m); }
+/* Überschrift des Datenspeichers wie in der Übung (.cw-app .cg-sub): --abstand-titel nach unten, ohne Rand an den Seiten */
+.lader-abbildung .lader-daten .cg-sub { margin: 0 0 var(--abstand-titel); }
+/* Programmende: kein Lexik-Token, deshalb ohne Farbe, kursiv und grau wie "Programmende" in der Übung */
+.pb-term.pb-ende { font-family: inherit; font-style: italic; font-weight: 500; font-size: var(--fs-m); color: var(--text-dim); }
+.token-marke--ende { font-family: inherit; font-style: italic; color: var(--text-dim); background: var(--panel-2); border: 1px solid var(--border); }
+/* .slide-split-figure svg (320px breit) soll die Linien-Ebene nicht treffen */
+.pb-abbildung .pb-wires { width: 100%; height: 100%; }
+
+.pb-n { display: flex; flex-direction: column; align-items: center; gap: 46px; }
+.pb-kids { display: flex; align-items: flex-start; gap: 18px; }
+.pb-kids.top { gap: 36px; }
+.pb-box { text-align: center; color: var(--text); }
+.pb-nt { padding: 9px 22px; border-radius: 999px; border: 1px solid var(--border); background: var(--panel); font-weight: 600; font-size: var(--fs-m); text-transform: uppercase; letter-spacing: .04em; }
+.pb-nt.open { border-color: var(--accent-text); }
+.pb-nt.ok { border-color: var(--ok); color: var(--ok); }
+.pb-nt.err { border-color: var(--fehler-baum); color: var(--fehler-baum); }
+.pb-term {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: var(--fs-l);
+  font-weight: 600;
+  min-width: 4.75rem;
+  padding: 11px 16px;
+  border-radius: var(--r-s);
+  border: 1.5px solid var(--text-dim);
+  background: var(--panel);
+}
+
+/* Bezeichner und Literal zeigen ihre Tokenklasse als kleine Beschriftung über dem Wert
+   (aktuelles Token und Blätter im Baum). Alle anderen Tokens bleiben einzeilig. */
+.pb-klasse {
+  display: block;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: .08em;
+  line-height: 1.2;
+  margin-bottom: 2px;
+  color: var(--text-dim);
+}
+.pb-wert { display: block; }
+
+/* Ablagefläche im Baum, gleiche Farben wie .dd-term-slot */
+.pb-zone {
+  border: 1.5px dashed var(--text-dim);
+  border-radius: var(--r-m);
+  color: var(--text-dim);
+  font-size: var(--fs-l);
+  font-weight: 600;
+  line-height: 1.3;
+  padding: 14px 22px;
+  min-width: 9.75rem;
+  transition: background .12s, border-color .12s;
+}
+.pb-zone.armed, .pb-dragging .pb-zone { background: color-mix(in srgb, var(--hover-ton) 2%, transparent); }
+.pb-zone.armed { cursor: pointer; }
+.pb-zone.hot, .pb-dragging .pb-zone.hot { border-style: solid; border-color: var(--accent-text); background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--text); }
+/* Falsche Ablagefläche (falscher Zug): Hinweisfarbe wie die Meldung */
+.pb-zone.bad { border-color: var(--meldung-hinweis-rand); color: var(--meldung-hinweis-titel); background: color-mix(in srgb, var(--meldung-hinweis-rand) 10%, transparent); }
+

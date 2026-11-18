@@ -1,0 +1,216 @@
+/* ---- feinabstimmung der phasenübungen (kapitel 2–6) ---- */
+/* Lexik in Kapitel 2 bis 6: Die Werkzeuge stehen zu zweit nebeneinander. Jede Spalte ist so
+   breit wie ihre breiteste Karte (links "Gliederungszeichen", rechts "Schlüsselwort"), die
+   Karten einer Spalte sind gleich breit. Die Seitenleiste ist so breit wie die beiden Spalten.
+   Die Zeile mit Vorschau und "Nächstes Zeichen" zählt für die Breite nicht mit (width: 0) und
+   füllt sie nur aus. */
+.cw-app .lex-sidebar { width: max-content; }
+.cw-app .lex-sidebar .lex-tools { display: grid; grid-template-columns: repeat(2, auto); }
+.cw-app .lex-sidebar .lex-peek { width: 0; min-width: 100%; }
+.cw-app .lex-sidebar .lex-peek > .lex-btn-next { min-width: 0; }
+
+/* Alle Texte der Seitenleiste in derselben Größe wie der Folientext */
+.cw-app .sem-sidebar, .cw-app .sem-sidebar * { font-size: var(--fs-l); }
+/* Die Karte der Seitenleiste reicht höchstens bis zum unteren Rand der Folie. "Aktueller
+   Knoten" (der erste Bereich) bleibt oben stehen, nur der Teil darunter (.sem-scroll mit
+   Symboltabelle, Aktionen und Fehler melden) scrollt, mit eigener Scrollleiste. */
+.cw-app .sem-sidebar > .pb-card { min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.cw-app .sem-sidebar > .pb-card > .pb-cell { flex: none; }
+.cw-app .sem-scroll { flex: 0 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; border-top: 1px solid var(--border); }
+
+/* Syntax- und Semantikregeln oben in der Karte der Seitenleiste: ohne Trennstrich zum
+   Bereich darunter und ohne eigenen Abstand nach unten */
+.cw-app .pb-cell-regeln { padding-bottom: 0; }
+.cw-app .pb-cell-regeln + .pb-cell { border-top: 0; }
+.cw-app .pb-cell-regeln > .pb-btn-regeln { font-size: var(--fs-l); font-weight: 500; }
+/* Zeilennummern und Adressen links im Programmspeicher haben in Kapitel 6 eine feste Breite,
+   damit die Bausteine auch ab (Z10) bündig stehen. Linksbündig, damit sie mit der Überschrift
+   des Fensters in einer Flucht beginnen. */
+.cw-app .robot-mrow .robot-lineno { min-width: var(--zeilen-breite, 0); text-align: left; }
+/* Die Nummer der Messzeile misst ihre eigene Breite, ohne Mindestbreite */
+.cw-app .robot-mrow.cg-messzeile .robot-lineno { min-width: 0; }
+/* Laufzeit mit Fächern: Das Maschinencode-Fenster ist so breit wie der breiteste mögliche
+   Baustein (unsichtbare Messzeile, siehe compiler-weg-laufzeit-faecher.js), statt fest 380px */
+.cw-app .lz-prog:has(.cg-messzeile) { width: fit-content; }
+
+/* Codegenerierung in Kapitel 6: Alle Fenster (Quellcode, Maschinencode, Bausteine, Datenzellen/
+   Register/Flag) haben ringsum denselben Innenabstand, die Überschriften stehen ohne eigenen
+   Versatz direkt an dieser Kante */
+.cw-app .cg-source, .cw-app .cg-build, .cw-app .cg-stage .robot-card { padding: var(--pad-l); }
+.cw-app .cg-pal-side h2 { margin-top: 0; }
+.cw-app .cg-sub { margin-left: 0; margin-right: 0; }
+.cw-app .robot-card > .cg-sub:first-child { margin-top: 0; }
+
+/* Laufzeit in Kapitel 6: Maschinencode, CPU, Register und Spielfeld haben ringsum denselben
+   Innenabstand, die Überschriften und das Raster der CPU stehen ohne eigenen Versatz */
+.cw-app .lz-prog { padding: var(--pad-l); }
+.cw-app .lz-cpu > h2 { margin-top: 0; }
+.cw-app .lz-cpu-grid { margin-left: 0; margin-right: 0; }
+/* Die rechte Spalte ist so breit wie das Spielfeld (Raster plus Innenabstand). Hinweis,
+   Steuerleiste und Meldung darunter zählen für die Breite nicht mit (width: 0) und füllen sie
+   nur aus, sonst würde der lange Hinweistext die Spalte und damit das Spielfeld verbreitern. */
+.cw-app .lz-right > :not(.robot-rt-grid-wrap) { width: 0; min-width: 100%; }
+
+/* Codegenerierung und Laufzeit in Kapitel 6: überall derselbe Abstand zwischen Überschrift und
+   Inhalt. Beim Maschinencode bringt die erste Zeile 5px eigenen Innenabstand mit, der zählt mit. */
+.cw-app .cg-source-title, .cw-app .robot-card h2, .cw-app .cg-sub { margin-bottom: var(--abstand-titel); }
+.cw-app .cg-build > .robot-ref-title, .cw-app .lz-prog > .robot-ref-title { margin-bottom: var(--abstand-titel); }
+.cw-app .lz-mem-note { margin-top: 0; }
+/* Codegenerierung in Kapitel 6: überall derselbe Abstand --gap-l, zwischen den Fenstern, in der
+   rechten Spalte, zwischen den Bausteinen der Ablage, zwischen den Zeilen und Zeilennummern des
+   Maschinencodes und zwischen den Feldern von Datenzellen und Registern */
+.cw-app .robot-stage.cg-stage, .cw-app .cg-pair, .cw-app .cg-stage .robot-ue-side,
+.cw-app .cg-pal-side .robot-ue-pal, .cw-app .cg-stage .cg-mem-grid, .cw-app .cg-stage .cg-reg-row { gap: var(--gap-l); }
+.cw-app .cg-build .robot-mrow { gap: var(--gap-l); padding: 0; }
+/* Quellcode-Phase: 15px Innenabstand im Eingabefeld, 15px zu den Knöpfen und zwischen ihnen */
+.cw-app .cw-eingabe { padding: var(--pad-l); }
+/* Auch in der Lexik 15px zwischen Textfeld und Seitenleiste.
+   nowrap: wird die Folie schmaler, schrumpft zuerst das Textfeld (.lex-main, bis min-width) statt
+   dass Knöpfe bzw. Seitenleiste darunter umbrechen. Ein flex-wrap bricht um, bevor irgendein
+   Element schrumpft, weil es mit seiner Wunschbreite (hier 90 bzw. 100 Zeichen) rechnet. */
+.cw-app .lex-stage { gap: var(--gap-l); flex-wrap: nowrap; }
+.cw-app .cw-quelle-knoepfe { gap: var(--gap-l); }
+
+/* Syntaxanalyse und semantische Analyse in Kapitel 6: Abstände zwischen Elementen --gap-l,
+   Innenabstände --pad-l, Überschrift eines Bereichs zu seinem Inhalt --abstand-titel */
+.cw-app .pb-stage, .cw-app .pb-sidebar, .cw-app .pb-tray,
+.cw-app .sem-cur, .cw-app .sem-tabelle, .cw-app .sem-aktionen, .cw-app .sem-reihe,
+.cw-app .sem-fehler-reihe { gap: var(--gap-l); }
+.cw-app .pb-cell { padding: var(--pad-l); gap: var(--abstand-titel); }
+.cw-app .pb-cell.pb-cell-regeln { padding-bottom: 0; }
+.cw-app .sem-bereich { padding: var(--pad-l); }
+.cw-app .sem-gruppe { gap: var(--abstand-titel); }
+/* An Trennlinien zwischen zwei Bereichen insgesamt --gap-l: je die Hälfte (7px) über und unter
+   der 1px-Linie statt je 15px Innenabstand. Außen behalten die Bereiche --pad-l. */
+.cw-app { --halb-trenn: calc((var(--gap-l) - 1px) / 2); }
+.cw-app .pb-cell + .pb-cell, .cw-app .sem-scroll > .pb-cell:first-child { padding-top: var(--halb-trenn); }
+.cw-app .pb-cell-regeln + .pb-cell { padding-top: var(--pad-l); }
+.cw-app .pb-cell:not(.pb-cell-regeln):has(+ .pb-cell), .cw-app .pb-cell:has(+ .sem-scroll) { padding-bottom: var(--halb-trenn); }
+/* Fehlerknöpfe der semantischen Analyse rot wie "Syntaxfehler melden" und die lexikalischen
+   Fehler (Orange bleibt den Meldungen vorbehalten) */
+.cw-app .sem-fehlerknopf { border-width: 1px; border-color: var(--fehler-knopf); color: var(--fehler-knopf); }
+.cw-app .sem-fehlerknopf:hover:not(:disabled) { background: color-mix(in srgb, var(--fehler-knopf) 12%, transparent); }
+/* Lexik in Kapitel 6: alle Texte der Seitenleiste in 17px (das Zeichen in der Vorschau bleibt
+   als Glyphe 28px) */
+.cw-app .lex-sidebar h2, .cw-app .lex-sidebar .lex-tool, .cw-app .lex-sidebar .lex-btn-next { font-size: var(--fs-l); }
+
+/* Roboter-Programm (robot-programm.js, Lektion 1.1): Abstände zwischen Elementen --gap-l,
+   Überschrift zu Inhalt --abstand-titel. Das Spielfeld (Feldabstand im JS) bleibt unverändert. */
+.robot-programm .robot-hint { margin-bottom: var(--gap-l); }
+.robot-programm .robot-stage, .robot-programm .robot-rightstack, .robot-programm .robot-actions,
+.robot-programm .robot-dir-grid { gap: var(--gap-l); }
+.robot-programm .robot-build-links .robot-mrow { gap: var(--gap-l); padding: calc(var(--gap-l) / 2) 0; }
+.robot-programm .robot-build-links .robot-mrow:first-child { padding-top: 0; }
+.robot-programm .robot-build-links .robot-mrow:last-child { padding-bottom: 0; }
+.robot-programm .robot-build-links .robot-ref-title, .robot-programm .robot-card h2 { margin: 0 0 var(--abstand-titel); }
+
+/* Modell aus Programmspeicher, CPU und Datenspeicher (Lektion 1.2): Abstände zwischen Elementen
+   --gap-l, Überschrift zu Inhalt --abstand-titel, wie in Kapitel 6. Die Phasen "holen →
+   dekodieren → ausführen" behalten ihren engen Abstand, damit sie in die CPU-Karte passen.
+   .modell-speicher ist dieselbe Abbildung ohne CPU (Folie 6) und bekommt dieselben Abstände. */
+.slide-split:has(.modell-cpu-spalte, .modell-speicher) { gap: var(--gap-l); }
+.slide-split-figure .robot-stage:is(.modell-cpu-spalte, .modell-speicher) { gap: var(--gap-l); }
+:is(.modell-cpu-spalte, .modell-speicher) .lz-prog > .robot-ref-title { margin: 0 0 calc(var(--abstand-titel) - var(--gap-l) / 2); }
+:is(.modell-cpu-spalte, .modell-speicher) .lz-row { gap: var(--gap-l); padding: calc(var(--gap-l) / 2) 0; }
+.modell-cpu-spalte .lz-cpu > h2 { margin: 0 0 var(--abstand-titel); }
+.modell-cpu-spalte .lz-cpu-grid { gap: var(--gap-l); margin: 0 0 var(--gap-l); }
+:is(.modell-cpu-spalte, .modell-speicher) .cg-sub { margin: 0 0 var(--abstand-titel); }
+:is(.modell-cpu-spalte, .modell-speicher) .cg-mem-grid { gap: var(--gap-l); }
+
+/* Seitenleiste der Syntaxanalyse: Bereiche ohne Trennlinien, nur --gap-l Abstand dazwischen.
+   Der Innenabstand liegt an der Karte, die Bereiche selbst haben keinen. (Die doppelten
+   Klassen heben die Regeln für Trennlinien weiter oben auf.) */
+.cw-app .cw-syn-sidebar.pb-sidebar > .pb-card { display: flex; flex-direction: column; gap: var(--gap-l); padding: var(--pad-l); }
+.cw-app .cw-syn-sidebar.pb-sidebar > .pb-card > .pb-cell.pb-cell { padding: 0; border-top: 0; }
+/* Bereichsüberschriften der Syntax-Seitenleiste ("Aktuelles Token", "Sprachkonstrukte") */
+.cw-app .cw-syn-sidebar .pb-cell > .pb-label { font-size: var(--fs-l); font-weight: 500; }
+/* Nichtterminale in der Syntax-Seitenleiste enger zusammen (--gap-m) als die Bereiche (--gap-l) */
+.cw-app .cw-syn-sidebar .pb-tray { gap: var(--gap-m); }
+/* Nichtterminale stehen zu zweit in einer Zeile (compiler-weg-syntax.js), die Lektionen ordnen
+   sie so, dass ein langer neben einem kurzen steht. Die Syntax-Seitenleiste ist so breit wie
+   ihr Inhalt, also wie die breiteste Zeile, statt fest 340px. Ohne contain: size zählt ihre Höhe
+   für die Zeile mit; sie ist aber nicht höher als die Baumfläche (anders als die Semantik-
+   Seitenleiste mit der Symboltabelle, die contain: size behält). */
+.cw-app .cw-syn-sidebar .pb-tray { flex-direction: column; align-items: flex-start; }
+.cw-app .pb-tray-zeile { display: flex; gap: var(--gap-m); }
+.cw-app .pb-sidebar.cw-syn-sidebar { width: max-content; contain: none; }
+/* Zeile mit dem aktuellen Token so hoch wie das Token selbst (ohne Mindesthöhe), damit die
+   Abstände genau stimmen: --abstand-titel über dem Token, --gap-l darunter bis zum nächsten
+   Bereich. Der blaue Ring beim Auswählen (box-shadow) zählt dabei nicht mit. */
+.cw-app .cw-syn-sidebar .pb-tokens { min-height: 0; }
+
+/* Semantik-Seitenleiste: "Fehler melden" ohne Trennlinie, --gap-l Abstand zu den Aktionen darüber,
+   die Fehlerknöpfe mit --gap-m untereinander (doppelte Klassen heben die Trennlinien-Regeln auf) */
+.cw-app .sem-scroll > .pb-cell.sem-cell-fehler.sem-cell-fehler { border-top: 0; padding-top: var(--gap-l); }
+.cw-app .sem-scroll > .pb-cell.pb-cell:has(+ .sem-cell-fehler) { padding-bottom: 0; }
+.cw-app .sem-cell-fehler { gap: var(--abstand-titel); }
+.cw-app .sem-cell-fehler .sem-fehler-reihe { gap: var(--gap-m); }
+/* "Aktionen" ebenfalls ohne Trennlinie, --gap-l Abstand zur Symboltabelle darüber */
+.cw-app .sem-scroll > .pb-cell.sem-cell-aktionen.sem-cell-aktionen { border-top: 0; padding-top: var(--gap-l); }
+.cw-app .sem-scroll > .pb-cell.pb-cell:has(+ .sem-cell-aktionen) { padding-bottom: 0; }
+
+
+.cw-app .lz-row { gap: var(--gap-l); }
+.cw-app .lz-row .lz-pc { margin-right: calc(6px - var(--gap-l)); }
+.cw-app .robot-mblock-placed, .cw-app .cg-stage .robot-mblock { padding: var(--gap-m); }
+
+.cw-app :is(.cg-build, .lz-prog) > .robot-ref-title { text-box: trim-both cap alphabetic; }
+.cw-app :is(.cg-rows-scroll, .lz-rows-scroll) {
+  display: flex; flex-direction: column;
+  scrollbar-gutter: auto; padding-right: 0;
+}
+.cw-app :is(.cg-rows-scroll, .lz-rows-scroll) { gap: var(--gap-m); }
+.cw-app :is(.cg-rows-scroll, .lz-rows-scroll) { padding: 3px; margin: -3px; }
+.cw-app :is(.cg-rows-scroll, .lz-rows-scroll) > .robot-mrow { padding: 0; }
+.cw-app :is(.cg-rows-scroll, .lz-rows-scroll) > .cg-messzeile { margin-bottom: calc(-1 * var(--gap-m)); }
+/* Zeilennummern in Kapitel 6 wie die Adressen in Monospace, (Z1) und [01] sehen so verwandt aus */
+.cw-app .robot-mrow .robot-lineno { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+.cw-app .cg-speicherleiste .cg-mem-cell:not(.cg-reg):not(.cg-flag) { width: var(--lz-feld); height: var(--lz-feld); display: flex; align-items: center; justify-content: center; padding: 0; }
+.cw-app .cg-speicherleiste .cg-mem-cell:not(.cg-reg):not(.cg-flag) .cg-mem-val { display: none; }
+.cw-app .cg-speicherleiste .cg-mem-cell:not(.cg-reg):not(.cg-flag) .cg-mem-addr { padding-bottom: 0; }
+
+/* Laufzeit in Kapitel 6: --gap-l zwischen den Fenstern und vor jeder Zwischenüberschrift,
+   --gap-m zwischen den Elementen innerhalb einer Gruppe. Das Spielfeld-Raster (im JS) und die
+   Phasen "holen → dekodieren → ausführen" bleiben unverändert. */
+.cw-app .robot-stage.lz-stage, .cw-app .lz-mid, .cw-app .lz-side, .cw-app .lz-right { gap: var(--gap-l); }
+.cw-app .lz-stage .cg-sub { margin-top: var(--gap-l); }
+.cw-app .lz-stage .robot-card > .cg-sub:first-child { margin-top: 0; }
+.cw-app .lz-cpu-grid { gap: var(--gap-m); margin-bottom: var(--gap-m); }
+.cw-app .lz-stage .cg-reg-row, .cw-app .lz-stage .cg-mem-grid, .cw-app .lz-controls, .cw-app .lz-controls .robot-actions { gap: var(--gap-m); }
+
+/* Laufzeit (Kapitel 2 bis 6): vier Spalten, damit das Fenster nicht so hoch wird:
+   Programmspeicher | CPU | Datenspeicher, Steuerleiste und Meldungen | Spielfeld.
+   Der Programmspeicher ist hier schmaler als im Lader (Zeilen sind kurz). Die 3. Spalte ist so
+   breit wie die Datenkarte mit vier Fächern (min-content, nicht fest in rem: das Innenpadding der
+   Karte ist px, sonst bliebe rechts je nach Schriftgröße ein Rest). Schritt-Text (.lz-msg, was gerade passiert) und Ergebnis
+   (.robot-ue-result, Ziel erreicht / Fehler) liegen in derselben Grid-Zelle, das Ergebnis darüber;
+   solange es da ist, wird der Schritt-Text nur ausgeblendet (visibility), damit er nicht durch
+   die halbtransparente Meldung scheint und die Zelle ihre Höhe behält. */
+.cw-app .lz-stage .lz-prog { width: 16rem; }
+.lz-side { --lz-feld: 3.25rem; flex: none; width: min-content; display: flex; flex-direction: column; }
+.lz-side .lz-datengrid { grid-template-columns: repeat(4, var(--lz-feld)); }
+.lz-meldung { display: grid; }
+.lz-meldung > * { grid-area: 1 / 1; min-width: 0; }
+.lz-meldung > .lz-msg { margin-top: 0; }
+.lz-meldung > .robot-ue-result { z-index: 1; align-self: start; max-width: none; }
+.lz-meldung:has(> .robot-ue-result:not([hidden])) > .lz-msg { visibility: hidden; }
+
+/* Speicherleiste der Codegenerierung (Kapitel 6) */
+.cw-app .cg-mem-side { width: min-content; }
+.cw-app .cg-speicherleiste { --lz-feld: 3.25rem; display: flex; flex-direction: column; gap: var(--gap-l); }
+.cw-app .cg-speicherleiste .cg-speicher-zeile { display: flex; gap: var(--gap-l); }
+.cw-app .cg-speicherleiste .cg-speicher-zeile > .cg-speicher-gruppe:first-child { flex: 2 1 var(--gap-m); }
+.cw-app .cg-speicherleiste .cg-speicher-zeile > .cg-speicher-gruppe:last-child { flex: 1 1 0; }
+.cw-app .cg-speicherleiste .cg-speicher-gruppe { display: flex; flex-direction: column; }
+.cw-app .cg-speicherleiste .cg-mem-title { margin-top: 0; }
+.cw-app .cg-speicherleiste .cg-reg-row { display: flex; gap: var(--gap-m); }
+.cw-app .cg-speicherleiste .cg-mem-grid { display: grid; grid-template-columns: repeat(4, var(--lz-feld)); gap: var(--gap-m); }
+.cw-app .cg-speicherleiste .cg-reg-row .cg-mem-cell { flex: 1 1 0; min-width: 0; }
+
+/* Laufzeit mit Fächern: Register und Flag in der CPU-Karte, nebeneinander unter dem Rechenwerk */
+.cw-app .lz-cpu-speicher { display: flex; gap: var(--gap-l); }
+.cw-app .lz-cpu-speicher .lz-cpu-gruppe { display: flex; flex-direction: column; }
+.cw-app .lz-cpu-speicher .cg-mem-cell { flex: none; min-width: 4rem; }
+.cw-app .lz-cpu-speicher .cg-mem-cell.lz-flag { flex: none; }
+

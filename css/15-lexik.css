@@ -1,0 +1,129 @@
+/* ---- lexik (compiler-weg-lexik.js) ---- */
+/* Farben der Token-Arten: siehe --c-* und --hl-* in :root. */
+.lex-stage {
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+.lex-main { flex: 1; min-width: 21.25rem; display: flex; flex-direction: column; gap: 14px; }
+.lex-code {
+  background: var(--quelltext-bg);
+  color: var(--quelltext-text);
+  border-radius: var(--r-l);
+  padding: 26px 28px;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: var(--fs-l);
+  line-height: 2.05;
+  word-break: break-all;
+  white-space: pre-wrap;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none; /* Ziehen auf Touch markiert statt zu scrollen */
+  cursor: crosshair;
+  box-sizing: border-box;
+  min-height: calc(52px + 2.05 * 1rem); /* eine Zeile hoch, auch wenn noch kein Zeichen gelesen ist */
+}
+.lex-ch.round-l { border-top-left-radius: var(--r-s); border-bottom-left-radius: var(--r-s); }
+.lex-ch.round-r { border-top-right-radius: var(--r-s); border-bottom-right-radius: var(--r-s); }
+.lex-ch.lex-sel { background: color-mix(in srgb, var(--accent) 28%, transparent) !important; border-radius: 0; }
+.lex-mark-identifier { background: var(--hl-identifier); color: var(--hl-identifier-text); }
+.lex-mark-keyword { background: var(--hl-keyword); color: var(--hl-keyword-text); }
+.lex-mark-literal { background: var(--hl-literal); color: var(--hl-literal-text); }
+.lex-mark-operator { background: var(--hl-operator); color: var(--hl-operator-text); }
+.lex-mark-separator { background: var(--hl-separator); color: var(--hl-separator-text); }
+.lex-mark-error { background: var(--hl-error); color: var(--hl-error-text); }
+/* Falsch gefärbt ist ein falscher Zug, kein inhaltlicher Fehler: Hinweisfarbe wie die Meldung */
+.lex-ch.lex-wrong { box-shadow: inset 0 -3px 0 -1px var(--meldung-hinweis-rand); }
+.lex-ch.lex-wrong.lex-nomark { background: color-mix(in srgb, var(--meldung-hinweis-rand) 14%, transparent); }
+
+.lex-sidebar {
+  width: 16.875rem;
+  flex: none;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-l);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.lex-sidebar h2 { font-size: var(--fs-m); color: var(--text-dim); margin: 2px 2px 6px; font-weight: 600; letter-spacing: .3px; }
+.lex-tools { display: flex; flex-direction: column; gap: 9px; }
+.lex-tool {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 13px;
+  border-radius: var(--r-m);
+  border: 1.5px solid transparent;
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-m);
+  text-align: left;
+  cursor: pointer;
+  transition: .12s;
+}
+.lex-tool:hover { background: var(--panel-hover); }
+.lex-tool.active { border-color: var(--tool-color); background: var(--panel-hover); box-shadow: 0 0 0 3px color-mix(in srgb, var(--tool-color) 18%, transparent); }
+.lex-swatch { width: 1.125rem; height: 1.125rem; border-radius: var(--r-s); flex: none; box-shadow: inset 0 0 0 1px var(--farbmuster-rand); }
+.lex-btn-reset { flex: 1; padding: 0.75rem; border-radius: var(--r-m); background: transparent; border: 1px solid var(--border); color: var(--text); font: inherit; font-weight: 600; font-size: var(--fs-m); cursor: pointer; transition: .15s; }
+.lex-btn-reset:hover { background: var(--panel); }
+.lex-btn-check { flex: 1; padding: 0.75rem; border-radius: var(--r-m); background: var(--accent); color: var(--weiss); font: inherit; font-weight: 600; font-size: var(--fs-m); border: none; cursor: pointer; transition: .15s; }
+.lex-btn-check:hover { filter: brightness(1.1); }
+
+/* Ergebnis wie .robot-ue-result in der Übersetzungsübung */
+.lex-result { align-self: flex-start; max-width: 100%; border-radius: var(--r-l); padding: 14px 16px; font-size: var(--fs-l); line-height: 1.45; border: 1px solid var(--border); }
+.lex-result.lex-ok { border-color: var(--meldung-erfolg-rand); background: var(--meldung-erfolg); }
+.lex-result.lex-err { border-color: var(--meldung-hinweis-rand); background: var(--meldung-hinweis); }
+/* Fester Titel der Meldungen in Lexik und Codegenerierung ("Geschafft" grün, "Falsch" orange), wie .pb-kind in Syntax und Semantik */
+.meldung-titel { display: block; font-weight: 500; color: var(--meldung-erfolg-titel); }
+.meldung-titel--hinweis { color: var(--meldung-hinweis-titel); }
+
+/* Compiler-Weg (compiler-weg-lexik.js): Meldung liegt oben rechts im Quellcode-Fenster
+   und lässt sich mit dem X schließen. Der Hintergrund muss deckend sein, weil die
+   Tönung sonst auf dem hellen Quellcode liegt. */
+.lex-codebox { position: relative; }
+.lex-codebox > .lex-result { position: absolute; top: 12px; right: 12px; z-index: 2; max-width: min(28.75rem, 70%); box-shadow: 0 6px 20px color-mix(in srgb, var(--schatten) 35%, transparent); }
+/* Knopf "Nächstes Zeichen" steht neben der Vorschau; die Beschriftung der Vorschau
+   (Leerzeichen, Zeilenumbruch, Textende) steht darunter und behält ihre Höhe. */
+.lex-peek > .lex-btn-next { align-self: stretch; padding: 0 0.75rem; }
+.lex-codebox .lex-hinweis-text { font-size: inherit; color: inherit; }
+/* Meldung in der Lexik: Platz für das × hält nur die erste Zeile frei (die Meldung selbst), der
+   aufgeklappte Hinweis darunter läuft unter Symbol und × durch (ohne Einrückung, über die ganze Breite).
+   Die Breite der Meldung richtet sich nach dem Meldungstext: Der Hinweis zählt dafür nicht mit
+   (width: 0), bricht um und macht die Meldung beim Aufklappen nicht breiter. Zwischen Text und ×
+   bleibt ein deutlicher Abstand. */
+.lex-codebox > .lex-result { min-width: min(22rem, 70%); }
+.lex-codebox > .lex-result > .lex-msg-text { padding-right: 40px; }
+.lex-codebox > .lex-result > .lex-hinweis-text { padding-left: 0; width: 0; min-width: 100%; }
+/* × zum Schließen einer Meldung (Lexik, Quellcode, Baumfenster in Kapitel 6), oben rechts in der Meldung */
+/* z-index: Der Meldungstext dahinter ist seit dem Symbol position: relative und läge sonst
+   über dem Knopf (später im HTML), der dann kaum noch anklickbar wäre */
+.msg-x { position: absolute; z-index: 1; top: 8px; right: 8px; width: 1.75rem; height: 1.75rem; border: none; border-radius: var(--r-s); background: transparent; color: var(--text-dim); font-size: 1.25rem; line-height: 1; cursor: pointer; transition: .15s; }
+.msg-x:hover { background: color-mix(in srgb, var(--hover-ton) 10%, transparent); color: var(--text); }
+
+/* Lexik-Übung (js/exercises/compiler-weg-lexik.js): Meldung mit
+   Hinweis-Button, Buttons am Ende gesperrt. */
+.lex-ch.lex-leer { color: var(--lex-leer); }
+/* Vorschau auf das nächste Zeichen (Lookahead), über den Werkzeugen */
+.lex-peek { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+.lex-peek-box {
+  width: 3.5rem; height: 3.5rem; flex: none;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--papier); color: var(--papier-text);
+  border: 2px dashed var(--text-dim); border-radius: var(--r-m);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 1.75rem; font-weight: 600;
+}
+.lex-peek-box.lex-peek-leer { color: var(--lex-leer); }
+.lex-swatch.lex-swatch-radierer { background: transparent !important; border: 2px dashed var(--text-dim); box-shadow: none; }
+.lex-tool:disabled, .lex-btn-next:disabled { opacity: .45; cursor: not-allowed; }
+.lex-tool:disabled:hover { background: var(--panel); }
+.lex-btn-next:disabled:hover { filter: none; }
+.lex-btn-hinweis { margin-top: 10px; padding: 0.5rem 0.875rem; border-radius: var(--r-m); background: transparent; border: 1px solid var(--border); color: var(--text); font: inherit; font-weight: 600; font-size: var(--fs-l); cursor: pointer; transition: .15s; }
+.lex-btn-hinweis:hover { background: var(--panel); }
+.lex-hinweis-text { margin-top: 10px; font-size: var(--fs-l); line-height: 1.45; color: var(--text-dim); }
+

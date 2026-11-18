@@ -1,0 +1,17 @@
+{
+  "name": "interaktive-lehreinheit",
+  "version": "1.0.0",
+  "description": "interaktive Lehreinheit für die Programmierlehre",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.js",
+    "build:pruefer": "node build.js --pruefer"
+  },
+  "keywords": [],
+  "author": "Leonard Hackenberg",
+  "license": "CC-BY-NC-SA-4.0",
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}
