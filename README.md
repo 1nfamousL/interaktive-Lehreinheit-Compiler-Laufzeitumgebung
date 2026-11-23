@@ -30,17 +30,17 @@ js/
   bau-info.js         Build-Datum und Prüferversion (Info-Pop-up)
   terminal-prompt.js  Terminalzeile im Hauptmenü (Animation)
   exercises/
-    robot-programm.js                  1.1: Roboter mit Befehlsblöcken steuern
-    drag-drop-diagram.js               1.3: Begriffe im Diagramm zuordnen
-    phasen-zuordnung.js                Quiz in 6.1 und am Ende von Kapitel 2 bis 5
-    einzelphase.js                     Kapitel 2 bis 5: eine Phase pro Folie
-    compiler-weg.js                    6.2: verkettet alle Phasen
-    compiler-weg-lexik.js              Phase Lexik (Scanner)
-    compiler-weg-syntax.js             Phase Syntax (Parser)
-    compiler-weg-semantik.js           Phase Semantik: Oberfläche
-    compiler-weg-semantik-regeln.js    Phase Semantik: Regeln und Prüfschritte
+    robot-programm.js                  Programmiere den Roboter, 1.1
+    drag-drop-diagram.js               Vervollständige die Übersetzungswege, 1.3
+    phasen-zuordnung.js                Ordne den Phasen zu, 6.1 und am Ende von Kapitel 2 bis 5
+    einzelphase.js                     eine Phase pro Folie, Kapitel 2 bis 5
+    compiler-weg.js                    Durchlaufe alle Phasen 6.2
+    compiler-weg-lexik.js              Werde zum Scanner
+    compiler-weg-syntax.js             Werde zum Parser
+    compiler-weg-semantik.js           Prüfe den Baum (Oberfläche)
+    compiler-weg-semantik-regeln.js    Prüfe den Baum (Regeln und Prüfschritte)
     compiler-weg-ast.js                baut aus den Tokens den Baum für die Semantik
-    compiler-weg-codegen.js            Phase Codegenerierung: Oberfläche
+    compiler-weg-codegen.js            Übersetze den Code (Oberfläche)
     compiler-weg-codegen-muster.js     Generator der Musterübersetzung
     compiler-weg-codegen-pruefung.js   Läufer und Prüfung der Übersetzung
     compiler-weg-laufzeit-faecher.js   Lader und Laufzeitsystem
@@ -51,9 +51,59 @@ css/                  nummerierte Teile des Stylesheets
 assets/               SVG-Icons
 dist/                 Build-Ergebnisse
 ```
+
+## Schichten und Abhängigkeiten
+```mermaid
+flowchart TB
+    html["index.html"] --> NAV
+
+    subgraph NAV["Navigation und Anzeige"]
+        direction LR
+        app["js/app.js"] --> speicher["progress<br/>notes<br/>mindmap-gesehen"] --> ls[("localStorage")]
+        app --> ansicht["mindmap<br/>terminal-prompt"]
+    end
+
+    subgraph DATA["Inhalt (data/)"]
+        direction LR
+        kapitel["kapitel<br/>mindmap (Daten)"] ~~~ idx["lektionen/index"] --> lekt["lektionen/*.js"] --> pha["phasenaufgaben"]
+    end
+
+    subgraph UEB["Übungen (js/exercises/)"]
+        direction LR
+        phasen["einzelphase<br/>compiler-weg"]
+        weitere["phasen-zuordnung<br/>robot-programm<br/>drag-drop-diagram"]
+    end
+
+    subgraph BASIS["Basis"]
+        direction LR
+        basis["maschine<br/>einheiten<br/>grammatik<br/>baum-abbildung<br/>bau-info"]
+        uebung["uebung.js"]
+    end
+
+    NAV --> DATA --> UEB --> BASIS
+```
 - Inhalt (`data/`), Navigation (`js/app.js`) und Aussehen (`css/`) sind strikt getrennt. Eine Lektion weiß nichts von der Navigation, `app.js` nichts vom Inhalt einer Lektion.
-- `index.html` verbindet die Dateien nicht, sie lädt nur `js/app.js`. Alles Weitere läuft über `import` in den JavaScript-Dateien.
-- Die Reihenfolge der `@import`-Zeilen in `style.css` gehört zur Kaskade und wird nicht umsortiert.
+- Ein Pfeil von einer Schicht zur nächsten gilt auch für die Schichten dahinter: `app.js` importiert zusätzlich `bau-info.js` und `uebung.js`, die Lektionen importieren zusätzlich `grammatik.js` und `baum-abbildung.js` aus der Basis.
+- `app.js` importiert keine Übung, und keine Übung importiert `app.js`. Sie teilen sich nur `uebung.js`, also die Ereignisnamen und die Meldefunktionen.
+- Die Lektionen importieren die Übungen und geben ihnen den Inhalt über `config` mit.
+
+#### Meldeweg der Übungen: 
+Die einzige Verbindung von einer Übung zu `app.js`.
+
+```mermaid
+flowchart LR
+    ueb["Übung<br/>(js/exercises/)"] -- "ruft meldeUebung, meldeGeloest,<br/>meldeBreite, meldeHilfe auf" --> uebung["uebung.js"]
+    uebung -. "CustomEvent auf dem<br/>Folien-Container" .-> app["js/app.js"]
+```
+
+#### Stylesheet:
+- Das Aussehen wird nicht über import eingebunden, sondern über index.html und style.css. 
+
+```mermaid
+flowchart LR
+    html["index.html"] -- "link rel=stylesheet" --> sheet["style.css"] -- "@import" --> teile["css/*.css"]
+```
+- Die Reihenfolge der @import-Zeilen in style.css ist wichtig: Widersprechen sich zwei CSS-Regeln, gilt die, die später geladen wird.
 
 ## Anwendung starten
 
