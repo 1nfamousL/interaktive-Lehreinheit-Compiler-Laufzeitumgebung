@@ -5,11 +5,8 @@
 .robot-card { background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--r-l); padding: 15px; }
 .robot-card h2 { font-size: var(--fs-m); line-height: 1.2; color: var(--text-dim); margin: -4px 0 8px; font-weight: 600; letter-spacing: .3px; }
 .robot-actions { display: flex; gap: 12px; }
-.robot-btn-reset { flex: 1; padding: 0.875rem; border-radius: var(--r-m); background: transparent; border: 1px solid var(--border); color: var(--text); font: inherit; font-weight: 600; font-size: var(--fs-m); cursor: pointer; transition: .15s; }
-.robot-btn-reset:hover { background: var(--panel); }
-.robot-check-btn { flex: 1; padding: 0.875rem; border-radius: var(--r-m); background: var(--accent); color: var(--weiss); font: inherit; font-weight: 600; font-size: var(--fs-m); border: none; cursor: pointer; transition: .15s; }
-.robot-check-btn:hover { filter: brightness(1.1); }
-.robot-check-btn:disabled { opacity: .5; cursor: not-allowed; }
+/* Buttons gleich breit */
+.robot-actions > .btn { flex: 1; }
 
 /* Programmspeicher */
 .robot-build { flex: 1; min-width: 21.25rem; max-width: 26.25rem; background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--r-l); padding: 18px; }

@@ -546,9 +546,9 @@ export function render(host, config) {
 
   // ---- Steuerleiste: Tempo, darunter Einzelschritt und Laden/Start ----
   // zurücksetzen gibt es hier nicht, die phase wird neu aufgebaut, das programm ist dann wieder entladen
-  const stepBtn = el('button', 'robot-btn-reset', 'Einzelschritt');
+  const stepBtn = el('button', 'btn btn--l btn--fill', 'Einzelschritt');
   stepBtn.onclick = () => { pause(); step(); };
-  const playBtn = el('button', 'robot-check-btn', 'Programm laden');
+  const playBtn = el('button', 'btn btn--l btn--accent', 'Programm laden');
   playBtn.onclick = () => {
     if (!geladen) { ladeInSpeicher(); return; }
     if (timer) pause(); else play();

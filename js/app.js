@@ -66,7 +66,7 @@ function vollbildKnopfBeschriften(btn) {
 function vollbildKnopfEinfuegen(actions) {
   if (!vollbildMoeglich()) return;
   const btn = document.createElement('button');
-  btn.className = 'icon-btn vollbild-btn';
+  btn.className = 'btn btn--icon-only vollbild-btn';
   btn.onclick = vollbildUmschalten;
   vollbildKnopfBeschriften(btn);
   actions.prepend(btn);
@@ -81,7 +81,7 @@ function buildHeadActions(onHelp) {
   helpBtn.textContent = 'Hilfe';
   helpBtn.onclick = onHelp;
   const settingsBtn = document.createElement('button');
-  settingsBtn.className = 'icon-btn';
+  settingsBtn.className = 'btn btn--icon-only';
   settingsBtn.title = 'Einstellungen';
   settingsBtn.setAttribute('aria-label', 'Einstellungen');
   settingsBtn.innerHTML = GEAR_ICON;
@@ -203,7 +203,7 @@ function openModal(title, bodyHtml, variant) {
   const variantClass = variant ? ` modal--${variant}` : '';
   backdrop.innerHTML = `
     <div class="modal${variantClass}" role="dialog" aria-modal="true" aria-label="${title}">
-      <div class="modal-head"><h3>${title}</h3><button class="modal-close" aria-label="Schließen">&times;</button></div>
+      <div class="modal-head"><h3>${title}</h3><button class="btn-close modal-close" aria-label="Schließen">&times;</button></div>
       <div class="modal-body"><div class="modal-text">${bodyHtml}</div></div>
     </div>
   `;
@@ -444,7 +444,7 @@ function openSettingsModal() {
     </div>`,
     `<div class="einst-zeile">
       <span class="einst-label">Daten</span>
-      <button type="button" class="secondary einst-reset">Zurücksetzen</button>
+      <button type="button" class="btn btn--l btn--fill einst-reset">Zurücksetzen</button>
     </div>
     <div class="rueckfrage" hidden></div>`,
   ];
@@ -478,8 +478,8 @@ function rueckfrageVerbinden(knopf, box, text, jaText, ja) {
     box.innerHTML = `
       <div class="cw-wechsel-text">${text}</div>
       <div class="cw-wechsel-knoepfe">
-        <button type="button" class="lex-btn-reset">Abbrechen</button>
-        <button type="button" class="lex-btn-check">${jaText}</button>
+        <button type="button" class="btn btn--l">Abbrechen</button>
+        <button type="button" class="btn btn--l btn--accent">${jaText}</button>
       </div>`;
     const [nein, jaB] = box.querySelectorAll('button');
     nein.onclick = () => { verbergen(); knopf.focus(); };
@@ -563,7 +563,7 @@ function renderMenu() {
   app.innerHTML = `
     <div class="head-actions menu-head-actions">
       <button class="btn" id="btnHelp">Hilfe</button>
-      <button class="icon-btn" id="btnSettings" title="Einstellungen" aria-label="Einstellungen">${GEAR_ICON}</button>
+      <button class="btn btn--icon-only" id="btnSettings" title="Einstellungen" aria-label="Einstellungen">${GEAR_ICON}</button>
     </div>
     <header class="mt">
       <p class="mt-kicker">Interaktive Lehreinheit</p>
@@ -581,13 +581,13 @@ function renderMenu() {
       </h1>
     </header>
     <div class="menu-actions">
-      <button class="menu-btn menu-btn-akzent" id="btnContinue">Fortsetzen</button>
-      <button class="primary" id="btnStart">Kapitelübersicht</button>
-      <button class="menu-btn" id="btnInfo">Über dieses Projekt</button>
+      <button class="btn btn--xl btn--accent" id="btnContinue">Fortsetzen</button>
+      <button class="btn btn--xl btn--primary" id="btnStart">Kapitelübersicht</button>
+      <button class="btn btn--xl btn--fill" id="btnInfo">Über dieses Projekt</button>
     </div>
     <div class="progress-tools">
-      <button id="btnExport" class="secondary">Daten exportieren</button>
-      <button id="btnImport" class="secondary">Daten importieren</button>
+      <button id="btnExport" class="btn btn--l btn--fill">Daten exportieren</button>
+      <button id="btnImport" class="btn btn--l btn--fill">Daten importieren</button>
       <input type="file" id="fileImport" accept="application/json" hidden>
     </div>
   `;
@@ -694,7 +694,7 @@ function renderChapters() {
   head.className = 'screen-head screen-head--sticky';
 
   const back = document.createElement('button');
-  back.className = 'back';
+  back.className = 'btn btn--icon-start';
   back.innerHTML = CHEVRON_LEFT + '<span class="btn-label">Menü</span>';
   back.onclick = () => goto('menu');
   head.appendChild(back);
@@ -826,7 +826,7 @@ function renderLesson() {
   const head = document.createElement('div');
   head.className = 'screen-head';
   const back = document.createElement('button');
-  back.className = 'back';
+  back.className = 'btn btn--icon-start';
   back.innerHTML = CHEVRON_LEFT + '<span class="btn-label">Kapitelübersicht</span>';
   back.onclick = backToChapters;
   // lektionstitel und folientitel stehen in einer zeile (spart höhe), der lektionstitel ist farbig abgesetzt
@@ -859,7 +859,7 @@ function renderLesson() {
   let uebungHilfe = null;
   const headActions = buildHeadActions(() => openLessonHelpModal(uebungHilfe));
   const notesBtn = document.createElement('button');
-  notesBtn.className = 'icon-btn' + (notesOpen ? ' active' : '');
+  notesBtn.className = 'btn btn--icon-only' + (notesOpen ? ' active' : '');
   notesBtn.title = 'Kommentare';
   notesBtn.setAttribute('aria-label', 'Kommentare zu dieser Folie');
   notesBtn.setAttribute('aria-pressed', String(notesOpen));
@@ -918,7 +918,7 @@ function renderLesson() {
     : sameChapter(nextLessonId) ? 'Nächste Lektion' : 'Nächstes Kapitel';
 
   const prevBtn = document.createElement('button');
-  prevBtn.className = 'btn slide-prev';
+  prevBtn.className = 'btn btn--icon-start slide-prev';
   prevBtn.innerHTML = CHEVRON_LEFT + `<span class="btn-label">${prevLabel}</span>`;
   prevBtn.disabled = isFirst && !prevLessonId;
   prevBtn.onclick = () => {
@@ -957,7 +957,7 @@ function renderLesson() {
   });
 
   const nextBtn = document.createElement('button');
-  nextBtn.className = 'btn slide-next';
+  nextBtn.className = 'btn btn--icon-end slide-next';
   nextBtn.innerHTML = `<span class="btn-label">${nextLabel}</span>` + CHEVRON_RIGHT;
   nextBtn.disabled = isLast && !nextLessonId;
   nextBtn.onclick = () => {
@@ -1046,7 +1046,7 @@ function buildNotesPanel(lessonId, slideId, onClose) {
 
   const closeBtn = document.createElement('button');
   closeBtn.type = 'button';
-  closeBtn.className = 'msg-x';
+  closeBtn.className = 'btn-close msg-x';
   closeBtn.setAttribute('aria-label', 'Kommentare schließen');
   closeBtn.textContent = '×';
   closeBtn.onclick = onClose;

@@ -2,6 +2,9 @@
 @import "css/01-grundlagen.css";            /* farben, schriftgrößen, abstände */
 @import "css/02-basis.css";                 /* zurücksetzen, basis-schriftgröße, mindestbreite */
 
+/* ---- bausteine ---- */
+@import "css/02-buttons.css";               /* buttons */
+
 /* ---- screens ---- */
 @import "css/03-menue.css";                 /* hauptmenü */
 @import "css/04-kapitel-kopf.css";          /* kapitelübersicht: kopfzeile */

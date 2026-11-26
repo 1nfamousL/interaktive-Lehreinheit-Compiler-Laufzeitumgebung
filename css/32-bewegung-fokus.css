@@ -11,9 +11,7 @@
 
 /* Knöpfe geben beim Klicken kurz nach. Nicht bei ziehbaren Elementen (Bausteine, Chips,
    Token), dort würde es das Ziehen stören. */
-:is(.btn, .primary, .secondary, .menu-btn, .icon-btn, .back, .view-tab,
-    .robot-check-btn, .robot-btn-reset, .lex-btn-check, .lex-btn-reset,
-    .pb-btn-regeln, .sem-fehlerknopf):not(:disabled):active {
+:is(.btn, .view-tab, .sem-fehlerknopf):not(:disabled):active {
   transform: scale(.97);
 }
 

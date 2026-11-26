@@ -1,0 +1,79 @@
+/* ---- buttons: ein Grundbaustein, Größen und Varianten ---- */
+/* class="btn" plus optional Größe (btn--s/-l/-xl), Variante (btn--fill/-primary/-accent) und Icon (btn--icon-start/-end/-only).
+   Ohne Zusatz: Umriss, 17px, Stärke 500. Das Aussehen kommt aus --btn-*-Variablen, die eine Variante oder ein Container
+   setzt (z. B. .cw-leiste-knoepfe in 18-weg.css). Breite und Lage gehören dem Container. */
+
+.btn {
+  font: inherit;
+  font-size: var(--btn-fs, var(--fs-l));
+  font-weight: var(--btn-fw, 500);
+  line-height: var(--btn-lh, 1.2);
+  color: var(--btn-fg, var(--text));
+  background: var(--btn-bg, transparent);
+  border: 1px solid var(--btn-border, var(--border));
+  border-radius: var(--btn-radius, var(--r-m));
+  padding: var(--btn-pad, var(--sp-8) var(--sp-16));
+  cursor: pointer;
+  transition: .15s;
+}
+.btn:hover:not(:disabled) {
+  color: var(--btn-fg-hover, var(--btn-fg, var(--text)));
+  background: var(--btn-bg-hover, var(--panel-2));
+  border-color: var(--btn-border-hover, var(--border-hover));
+}
+.btn:disabled { opacity: var(--btn-disabled, .4); cursor: not-allowed; }
+
+/* Größen */
+/* klein: Aktionen am Rand einer Übung. Textbox auf Versalhöhe zugeschnitten, damit der Text mittig sitzt */
+.btn--s { --btn-pad: var(--sp-10) var(--sp-12); text-box: trim-both cap alphabetic; }
+/* groß: Übungen, Dialoge. Extragroß: Hauptmenü */
+.btn--l, .btn--xl { --btn-fs: var(--fs-m); --btn-fw: 600; --btn-lh: normal; --btn-disabled: .5; }
+.btn--l  { --btn-pad: var(--sp-12); }
+.btn--xl { --btn-pad: var(--sp-16) var(--sp-20); --btn-radius: var(--r-l); }
+
+/* Pfeil und Text (<span class="btn-label">): auf der Seite des Pfeils weniger Innenabstand, die Pfeil-Box bringt Leerraum mit */
+.btn--icon-start, .btn--icon-end { display: inline-flex; align-items: center; gap: var(--sp-6); }
+.btn--icon-start { --btn-pad: var(--sp-8) var(--sp-16) var(--sp-8) var(--sp-12); }
+.btn--icon-end   { --btn-pad: var(--sp-8) var(--sp-12) var(--sp-8) var(--sp-16); }
+
+/* nur Icon (Vollbild, Einstellungen, Kommentare): quadratisch in Kopfzeilenhöhe. .active: Kommentare offen */
+.btn--icon-only {
+  --btn-pad: 0; --btn-fg: var(--text-dim); --btn-fg-hover: var(--text);
+  width: var(--kopf-hoehe); height: var(--kopf-hoehe); flex: none;
+  display: grid; place-items: center;
+}
+.btn--icon-only svg { width: 1.25rem; height: 1.25rem; }
+.btn--icon-only.active {
+  --btn-fg: var(--accent-text); --btn-fg-hover: var(--accent-text);
+  --btn-border: var(--accent-text); --btn-border-hover: var(--accent-text);
+  --btn-bg: var(--panel-2);
+}
+
+/* Varianten */
+/* gefüllt: auch auf --panel ohne Hover sichtbar */
+.btn--fill    { --btn-bg: var(--panel-2); --btn-bg-hover: var(--panel-hover); }
+/* heller Hauptknopf im Menü */
+.btn--primary { --btn-bg: var(--primary); --btn-fg: var(--primary-text); --btn-border: transparent;
+                --btn-bg-hover: var(--primary-hover); --btn-border-hover: transparent; }
+/* Akzent: Start, Prüfen, Weiter. Beim Überfahren heller */
+.btn--accent  { --btn-bg: var(--accent); --btn-fg: var(--weiss); --btn-border: transparent;
+                --btn-bg-hover: var(--accent); --btn-border-hover: transparent; }
+.btn--accent:hover:not(:disabled) { filter: brightness(1.1); }
+
+/* ---- × zum Schließen (Pop-ups, Meldungen, Kommentarfeld) ---- */
+/* Eigener Baustein, kein .btn. Die Lage steht beim Ort (.modal-close, .msg-x). Symbol: assets/x.svg als Maske, weil das
+   Zeichen „×“ je nach Schrift zu tief sitzt. Das Zeichen bleibt im HTML (font-size: 0), vorgelesen wird das aria-label. */
+.btn-close {
+  position: relative; flex: none;
+  width: 1.75rem; height: 1.75rem; padding: 0;
+  border: none; border-radius: var(--r-s);
+  background: transparent; color: var(--text-dim);
+  font-size: 0;
+  cursor: pointer; transition: .15s;
+}
+.btn-close:hover { background: color-mix(in srgb, var(--hover-ton) 10%, transparent); color: var(--text); }
+.btn-close::before {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 1rem; height: 1rem;
+  transform: translate(-50%, -50%);
+  background-color: currentColor; mask: url("../assets/x.svg") no-repeat center / contain;
+}

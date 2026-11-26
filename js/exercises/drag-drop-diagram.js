@@ -127,7 +127,7 @@ export function render(container, config) {
   container.innerHTML = `
     <div class="dd-kopf">
       ${config.hinweis ? `<p class="dd-hint">${config.hinweis}</p>` : ''}
-      <button type="button" class="lex-btn-reset cw-schritt-btn" hidden>Schritt vormachen</button>
+      <button type="button" class="btn btn--s cw-schritt-btn" hidden>Schritt vormachen</button>
     </div>
     <div class="dd-stage${config.ablage === 'unten' ? ' dd-unten' : ''}">
       <div class="dd-diagram-wrap">${config.svg}</div>
@@ -140,9 +140,9 @@ export function render(container, config) {
     <div class="cw-leiste-anker cw-leiste-anker--links">
       <div class="cw-leiste dd-leiste" hidden>
         <div class="cw-leiste-text"></div>
-        <button class="lex-btn-hinweis" type="button" hidden>Zeige Hinweis</button>
+        <button class="btn btn--s lex-btn-hinweis" type="button" hidden>Zeige Hinweis</button>
         <div class="lex-hinweis-text" hidden></div>
-        <button class="msg-x" type="button" aria-label="Meldung schließen">×</button>
+        <button class="btn-close msg-x" type="button" aria-label="Meldung schließen">×</button>
       </div>
     </div>
   `;

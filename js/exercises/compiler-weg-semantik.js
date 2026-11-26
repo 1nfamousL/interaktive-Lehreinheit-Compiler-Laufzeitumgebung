@@ -39,15 +39,15 @@ export function render(container, config) {
           <div class="pb-tree-scroll"><div class="pb-tree"></div></div>
           <div class="pb-msg" aria-live="polite">
             <span class="pb-kind"></span><span class="pb-text"></span>
-            <button class="lex-btn-hinweis" type="button" hidden>Zeige Hinweis</button>
+            <button class="btn btn--s lex-btn-hinweis" type="button" hidden>Zeige Hinweis</button>
             <div class="lex-hinweis-text" hidden></div>
-            <button class="msg-x" type="button" aria-label="Meldung schließen">×</button>
+            <button class="btn-close msg-x" type="button" aria-label="Meldung schließen">×</button>
           </div>
         </section>
       </div>
       <aside class="pb-sidebar sem-sidebar" aria-label="Prüfung">
         <div class="pb-card">
-          ${config.regelnHtml ? '<div class="pb-cell pb-cell-regeln"><button class="pb-btn-regeln" type="button">Semantikregeln</button></div>' : ''}
+          ${config.regelnHtml ? '<div class="pb-cell pb-cell-regeln"><button class="btn pb-btn-regeln" type="button">Semantikregeln</button></div>' : ''}
           <div class="pb-cell">
             <div class="pb-label">Aktueller Knoten</div>
             <div class="sem-cur"></div>
@@ -315,7 +315,7 @@ export function render(container, config) {
     regelnModal.className = 'modal-backdrop';
     regelnModal.innerHTML = `
       <div class="modal" role="dialog" aria-modal="true" aria-label="Semantikregeln">
-        <div class="modal-head"><h3>Semantikregeln</h3><button class="modal-close" aria-label="Schließen">&times;</button></div>
+        <div class="modal-head"><h3>Semantikregeln</h3><button class="btn-close modal-close" aria-label="Schließen">&times;</button></div>
         <div class="modal-body"><div class="modal-text modal-text--regeln">${config.regelnHtml}</div></div>
       </div>
     `;

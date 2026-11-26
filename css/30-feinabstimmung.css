@@ -22,7 +22,6 @@
    Bereich darunter und ohne eigenen Abstand nach unten */
 .cw-app .pb-cell-regeln { padding-bottom: 0; }
 .cw-app .pb-cell-regeln + .pb-cell { border-top: 0; }
-.cw-app .pb-cell-regeln > .pb-btn-regeln { font-size: var(--fs-l); font-weight: 500; }
 /* Zeilennummern und Adressen links im Programmspeicher haben in Kapitel 6 eine feste Breite,
    damit die Bausteine auch ab (Z10) bündig stehen. Linksbündig, damit sie mit der Überschrift
    des Fensters in einer Flucht beginnen. */
@@ -80,7 +79,7 @@
 .cw-app .pb-cell.pb-cell-regeln { padding-bottom: 0; }
 .cw-app .sem-bereich { padding: var(--pad-l); }
 .cw-app .sem-gruppe { gap: var(--abstand-titel); }
-/* An Trennlinien zwischen zwei Bereichen insgesamt --gap-l: je die Hälfte (7px) über und unter
+/* An Trennlinien zwischen zwei Bereichen insgesamt --gap-l: je die Hälfte (7,5px) über und unter
    der 1px-Linie statt je 15px Innenabstand. Außen behalten die Bereiche --pad-l. */
 .cw-app { --halb-trenn: calc((var(--gap-l) - 1px) / 2); }
 .cw-app .pb-cell + .pb-cell, .cw-app .sem-scroll > .pb-cell:first-child { padding-top: var(--halb-trenn); }

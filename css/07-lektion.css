@@ -11,15 +11,7 @@
 .slide-nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; flex: none; }
 .slide-prev { justify-self: start; }
 .slide-next { justify-self: end; }
-/* Maße wie .back (Menü/Kapitel), nur mit gespiegeltem Padding beim
-   Weiter-Button, weil dort das Icon rechts steht. */
-.slide-prev, .slide-next {
-  font-size: var(--fs-l); font-weight: 500; line-height: 1.2;
-  display: inline-flex; align-items: center; gap: 6px;
-  border-radius: var(--r-m);
-}
-.slide-prev { padding: 9px 16px 9px 12px; }
-.slide-next { padding: 9px 12px 9px 16px; }
+/* Aussehen: .btn--icon-start/-end (02-buttons.css) */
 .slide-dots { display: flex; align-items: center; gap: 8px; }
 .slide-connector { height: 2px; width: 1.5rem; flex: none; background: var(--verbinder); border-radius: var(--r-s); }
 /* Schrift wie die Buttons in der Kopfzeile. Ein <button> erbt die Schrift

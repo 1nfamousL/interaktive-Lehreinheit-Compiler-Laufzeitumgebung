@@ -105,8 +105,8 @@ export function render(container, config) {
   container.innerHTML = `
     <div class="robot-ue-phases">
       <p class="cw-aufgabe">${AUFGABE[config.phase]}</p>
-      <button class="lex-btn-reset cw-schritt-btn" type="button" hidden>Schritt vormachen</button>
-      <button class="lex-btn-reset cw-reset-btn" type="button">Zurücksetzen</button>
+      <button class="btn btn--s cw-schritt-btn" type="button" hidden>Schritt vormachen</button>
+      <button class="btn btn--s cw-reset-btn" type="button">Zurücksetzen</button>
     </div>
     <div class="cw-host"></div>
   `;

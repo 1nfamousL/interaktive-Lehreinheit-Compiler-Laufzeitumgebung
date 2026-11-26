@@ -4,7 +4,7 @@
 html, body { margin: 0; height: 100%; }
 /* Basis für alle rem-Werte. Größen (Breiten, Höhen, Schrift) stehen in rem und
    wachsen mit der Fensterbreite: 1440px Fenster = 16px Grundschrift (Faktor 1).
-   Abstände (padding, margin, gap), Radien, Schatten und Linien bleiben px. */
+   Abstände aus der Skala --sp-* (01-grundlagen.css). Radien, Schatten und Linien bleiben px. */
 html { font-size: clamp(10px, calc(6.32px + 0.672vw), 32px); }
 /* Mindestbreite: darunter wird seitlich gescrollt, statt das Layout weiter zu stauchen. */
 html { overflow-x: auto; }
@@ -53,25 +53,7 @@ body {
 .lesson-head-trenner { order: 2; color: var(--text-dim); font-weight: 400; margin: 0 .5em; }
 .lesson-head-folie { order: 1; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
 
-.back {
-  font: inherit;
-  font-size: var(--fs-l);
-  font-weight: 500;
-  line-height: 1.2;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text);
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: var(--r-m);
-  /* links weniger, weil das Icon (18px-Box) eigenen Leerraum mitbringt */
-  padding: 9px 16px 9px 12px;
-  cursor: pointer;
-  transition: .15s;
-}
-.back:hover { background: var(--panel-2); color: var(--text); }
-/* Pfeil in Zurück-/Weiter-Buttons: 18x18-Box mit 1:1-viewBox (siehe
+/* Pfeil in Zurück-/Weiter-Buttons (.btn--icon-start/-end, 02-buttons.css): 18x18-Box mit 1:1-viewBox (siehe
    CHEVRON_LEFT/CHEVRON_RIGHT in js/app.js), der Pfeil selbst ist darin ca.
    10px hoch, also etwa Versalhöhe der 17px-Schrift. Strichstärke 2 = 2px,
    weil der viewBox-Maßstab 1 ist. */

@@ -81,9 +81,9 @@ export function render(container, config) {
         <div class="lex-codebox">
           <div class="lex-code"></div>
           <div class="lex-result" hidden>
-            <button class="msg-x" type="button" aria-label="Meldung schließen">×</button>
+            <button class="btn-close msg-x" type="button" aria-label="Meldung schließen">×</button>
             <div class="lex-msg-text"></div>
-            <button class="lex-btn-hinweis" hidden>Zeige Hinweis</button>
+            <button class="btn btn--s lex-btn-hinweis" hidden>Zeige Hinweis</button>
             <div class="lex-hinweis-text" hidden></div>
           </div>
         </div>
@@ -92,7 +92,7 @@ export function render(container, config) {
         <h2>Vorschau</h2>
         <div class="lex-peek">
           <div class="lex-peek-box"></div>
-          <button class="lex-btn-check lex-btn-next"></button>
+          <button class="btn btn--l btn--accent lex-btn-next"></button>
         </div>
         <h2>Werkzeuge</h2>
         <div class="lex-tools"></div>

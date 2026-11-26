@@ -70,10 +70,6 @@
    darunter zwei Button-Zeilen (.robot-actions, Buttons gleich breit) */
 .lz-controls { display: flex; flex-direction: column; gap: 12px; }
 .lz-controls button { flex: 1 1 0; min-width: 0; }
-.robot-btn-reset:disabled { opacity: .5; cursor: not-allowed; }
-/* Laufzeit in Kapitel 5 und 6 ("Einzelschritt") und Roboter-Übung 1.1 ("Zurücksetzen"):
-   Hover wie bei .btn (Hilfe, nächste Lektion …) */
-.cw-app .lz-controls .robot-btn-reset:hover:not(:disabled), .robot-programm .robot-btn-reset:hover:not(:disabled) { background: var(--panel-2); border-color: var(--border-hover); }
 /* Pfeil selbst gezeichnet (appearance: none), weil sich der Pfeil des nativen
    <select> nicht vom Rand wegschieben lässt */
 .lz-speed {

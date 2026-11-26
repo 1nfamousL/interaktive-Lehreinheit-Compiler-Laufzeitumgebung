@@ -69,10 +69,6 @@
 .lex-tool:hover { background: var(--panel-hover); }
 .lex-tool.active { border-color: var(--tool-color); background: var(--panel-hover); box-shadow: 0 0 0 3px color-mix(in srgb, var(--tool-color) 18%, transparent); }
 .lex-swatch { width: 1.125rem; height: 1.125rem; border-radius: var(--r-s); flex: none; box-shadow: inset 0 0 0 1px var(--farbmuster-rand); }
-.lex-btn-reset { flex: 1; padding: 0.75rem; border-radius: var(--r-m); background: transparent; border: 1px solid var(--border); color: var(--text); font: inherit; font-weight: 600; font-size: var(--fs-m); cursor: pointer; transition: .15s; }
-.lex-btn-reset:hover { background: var(--panel); }
-.lex-btn-check { flex: 1; padding: 0.75rem; border-radius: var(--r-m); background: var(--accent); color: var(--weiss); font: inherit; font-weight: 600; font-size: var(--fs-m); border: none; cursor: pointer; transition: .15s; }
-.lex-btn-check:hover { filter: brightness(1.1); }
 
 /* Ergebnis wie .robot-ue-result in der Übersetzungsübung */
 .lex-result { align-self: flex-start; max-width: 100%; border-radius: var(--r-l); padding: 14px 16px; font-size: var(--fs-l); line-height: 1.45; border: 1px solid var(--border); }
@@ -89,7 +85,7 @@
 .lex-codebox > .lex-result { position: absolute; top: 12px; right: 12px; z-index: 2; max-width: min(28.75rem, 70%); box-shadow: 0 6px 20px color-mix(in srgb, var(--schatten) 35%, transparent); }
 /* Knopf "Nächstes Zeichen" steht neben der Vorschau; die Beschriftung der Vorschau
    (Leerzeichen, Zeilenumbruch, Textende) steht darunter und behält ihre Höhe. */
-.lex-peek > .lex-btn-next { align-self: stretch; padding: 0 0.75rem; }
+.lex-peek > .lex-btn-next { flex: 1; align-self: stretch; --btn-pad: 0 var(--sp-12); }
 .lex-codebox .lex-hinweis-text { font-size: inherit; color: inherit; }
 /* Meldung in der Lexik: Platz für das × hält nur die erste Zeile frei (die Meldung selbst), der
    aufgeklappte Hinweis darunter läuft unter Symbol und × durch (ohne Einrückung, über die ganze Breite).
@@ -99,11 +95,10 @@
 .lex-codebox > .lex-result { min-width: min(22rem, 70%); }
 .lex-codebox > .lex-result > .lex-msg-text { padding-right: 40px; }
 .lex-codebox > .lex-result > .lex-hinweis-text { padding-left: 0; width: 0; min-width: 100%; }
-/* × zum Schließen einer Meldung (Lexik, Quellcode, Baumfenster in Kapitel 6), oben rechts in der Meldung */
+/* × oben rechts in einer Meldung (Aussehen: .btn-close) */
 /* z-index: Der Meldungstext dahinter ist seit dem Symbol position: relative und läge sonst
    über dem Knopf (später im HTML), der dann kaum noch anklickbar wäre */
-.msg-x { position: absolute; z-index: 1; top: 8px; right: 8px; width: 1.75rem; height: 1.75rem; border: none; border-radius: var(--r-s); background: transparent; color: var(--text-dim); font-size: 1.25rem; line-height: 1; cursor: pointer; transition: .15s; }
-.msg-x:hover { background: color-mix(in srgb, var(--hover-ton) 10%, transparent); color: var(--text); }
+.msg-x { position: absolute; z-index: 1; top: 8px; right: 8px; }
 
 /* Lexik-Übung (js/exercises/compiler-weg-lexik.js): Meldung mit
    Hinweis-Button, Buttons am Ende gesperrt. */
@@ -122,8 +117,7 @@
 .lex-swatch.lex-swatch-radierer { background: transparent !important; border: 2px dashed var(--text-dim); box-shadow: none; }
 .lex-tool:disabled, .lex-btn-next:disabled { opacity: .45; cursor: not-allowed; }
 .lex-tool:disabled:hover { background: var(--panel); }
-.lex-btn-next:disabled:hover { filter: none; }
-.lex-btn-hinweis { margin-top: 10px; padding: 0.5rem 0.875rem; border-radius: var(--r-m); background: transparent; border: 1px solid var(--border); color: var(--text); font: inherit; font-weight: 600; font-size: var(--fs-l); cursor: pointer; transition: .15s; }
-.lex-btn-hinweis:hover { background: var(--panel); }
+/* "Zeige Hinweis" (.btn--s): Abstand zur Meldung */
+.lex-btn-hinweis { margin-top: 10px; }
 .lex-hinweis-text { margin-top: 10px; font-size: var(--fs-l); line-height: 1.45; color: var(--text-dim); }
 

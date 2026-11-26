@@ -5,7 +5,7 @@
 #app:has(#btnStart) {
   /* Einheitlicher Abstand zwischen allen Zeilen des Titels und zu den Buttons.
      In rem, damit er wie die Titelschrift mit der Fenstergröße wächst (Buttons: 4 Lücken). */
-  --mt-luecke: 0.75rem;
+  --mt-luecke: var(--sp-12);
   position: relative;
   align-items: center;
   text-align: center;
@@ -144,57 +144,12 @@
   margin-top: calc(4 * var(--mt-luecke));
 }
 
-.primary {
-  font: inherit;
-  font-size: var(--fs-m);
-  font-weight: 600;
-  padding: 0.9375rem 1.125rem;
-  border-radius: var(--r-l);
-  background: var(--primary);
-  border: 1px solid transparent;
-  color: var(--primary-text);
-  cursor: pointer;
-  transition: .15s;
-}
-.primary:hover { background: var(--primary-hover); }
-
-.menu-btn {
-  font: inherit;
-  font-size: var(--fs-m);
-  font-weight: 600;
-  padding: 0.9375rem 1.125rem;
-  border-radius: var(--r-l);
-  background: var(--panel-2);
-  border: 1px solid var(--border);
-  color: var(--text);
-  cursor: pointer;
-  transition: .15s;
-}
-.menu-btn:hover { background: var(--panel-hover); border-color: var(--border-hover); }
-/* Fortsetzen: gleiche Farbe wie der Start-Knopf der Roboter-Übung (.robot-check-btn) */
-.menu-btn.menu-btn-akzent { background: var(--accent); border-color: transparent; color: var(--weiss); }
-.menu-btn.menu-btn-akzent:hover { background: var(--accent); border-color: transparent; filter: brightness(1.1); }
-.menu-btn.menu-btn-akzent:disabled { opacity: .5; cursor: not-allowed; filter: none; }
-
+/* Buttons: .btn (02-buttons.css), hier nur die Anordnung */
 .progress-tools {
   display: flex;
   gap: 10px;
   margin-top: 14px;
   width: min(clamp(13.75rem, 22vw, 26.25rem), 100%);
 }
-
-.secondary {
-  flex: 1;
-  font: inherit;
-  font-size: var(--fs-m);
-  font-weight: 600;
-  padding: 0.75rem 0.875rem;
-  border-radius: var(--r-m);
-  border: 1px solid var(--border);
-  background: var(--panel-2);
-  color: var(--text);
-  cursor: pointer;
-  transition: .15s;
-}
-.secondary:hover { background: var(--panel-hover); border-color: var(--border-hover); }
+.progress-tools > .btn { flex: 1; }
 

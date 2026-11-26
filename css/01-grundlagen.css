@@ -178,20 +178,31 @@
   --fs-m: 0.9375rem;    /* 15px: Karten, Chips, Oberfläche */
   --fs-l: 1.0625rem;    /* 17px: Folientext */
   --fs-xl: 1.375rem;    /* 22px: Überschriften */
-  /* Diese Abstandsvariablen stehen in rem und wachsen mit der Grundschrift (html, clamp);
-     feste px-Abstände im übrigen CSS bleiben vorerst px.
-  Innenabstände: --pad-l für den Rahmen um den Screen (#app) und die Fenster in Kapitel 2 bis 6,
-     --pad-xl für die Folie (.slide). */
-  --pad-l: 0.9375rem;   /* 15px */
-  --pad-xl: 1.25rem;    /* 20px */
+  /* Abstände (padding, margin, gap), zehn Stufen in rem, Name = px bei 16px Grundschrift. Größere Werte werden aus
+     dem Element berechnet, für das sie Platz halten, negative Ränder sind calc(-1 * Stufe). 1px-Ausgleich und em bleiben. */
+  --sp-2: 0.125rem;
+  --sp-4: 0.25rem;
+  --sp-6: 0.375rem;
+  --sp-8: 0.5rem;
+  --sp-10: 0.625rem;
+  --sp-12: 0.75rem;
+  --sp-16: 1rem;
+  --sp-20: 1.25rem;
+  --sp-24: 1.5rem;
+  --sp-32: 2rem;
+  /* Abstände nach Rolle. --pad-l: Rahmen um den Screen (#app) und Fenster in Kapitel 2 bis 6, --pad-xl: Folie (.slide) */
+  --pad-l: var(--sp-16);
+  --pad-xl: var(--sp-20);
   /* Abstand zwischen der Überschrift eines Fensters und dem Inhalt darunter, genutzt in den
      Phasenübungen, der Roboter-Übung 1.1 und dem Modell in 1.2. */
-  --abstand-titel: 0.625rem;   /* 10px */
+  --abstand-titel: var(--sp-10);
   /* Abstand zwischen nebeneinander oder untereinander stehenden Elementen (gap, Außenabstand), genutzt in den
      Phasenübungen, der Roboter-Übung 1.1 und dem Modell in 1.2. */
-  --gap-l: 0.9375rem;   /* 15px */
+  --gap-l: var(--sp-16);
   /* Kleinerer Abstand innerhalb einer Gruppe, z. B. zwischen den Nichtterminalen */
-  --gap-m: 0.625rem;    /* 10px */
+  --gap-m: var(--sp-10);
+  /* Höhe der Bedienelemente in den Kopfzeilen */
+  --kopf-hoehe: 2.375rem;   /* 38px */
   /* Eckenradien, vier Stufen. Ein Element in einem Fenster hat höchstens den Radius seines
      Fensters. Ausnahmen: 999px (Pillen), 50% (Kreise), 0 und die eckige .memory-box. */
   --r-s: 6px;    /* Chips, Bausteine, kleine Felder */

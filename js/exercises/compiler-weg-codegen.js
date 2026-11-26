@@ -169,7 +169,7 @@ export function render(container, config) {
 
   const actions = el('div', 'robot-actions');
   // zurücksetzen gibt es hier nicht, die phase wird neu aufgebaut
-  const checkBtn = el('button', 'robot-check-btn', 'Überprüfen');
+  const checkBtn = el('button', 'btn btn--l btn--accent', 'Überprüfen');
   checkBtn.onclick = ueberpruefen;
   actions.appendChild(checkBtn);
   memSide.appendChild(actions);

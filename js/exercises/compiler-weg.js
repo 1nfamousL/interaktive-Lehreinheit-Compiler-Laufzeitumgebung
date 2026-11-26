@@ -77,9 +77,9 @@ export function render(container, config) {
       <button type="button" class="robot-ue-phase" data-phase="5">Codegenerierung</button>
       <span class="robot-ue-phase-sep" aria-hidden="true">→</span>
       <button type="button" class="robot-ue-phase" data-phase="6">Laufzeitumgebung</button>
-      <button class="lex-btn-reset cw-loesen-btn" type="button" hidden>Phase lösen</button>
-      <button class="lex-btn-reset cw-schritt-btn" type="button" hidden>Schritt vormachen</button>
-      <button class="lex-btn-reset cw-reset-btn" type="button" hidden>Zurücksetzen</button>
+      <button class="btn btn--s cw-loesen-btn" type="button" hidden>Phase lösen</button>
+      <button class="btn btn--s cw-schritt-btn" type="button" hidden>Schritt vormachen</button>
+      <button class="btn btn--s cw-reset-btn" type="button" hidden>Zurücksetzen</button>
     </div>
     <div class="cw-wechsel" hidden></div>
     <div class="cw-host"></div>
@@ -129,12 +129,12 @@ export function render(container, config) {
     k.className = 'cw-wechsel-knoepfe';
     const nein = document.createElement('button');
     nein.type = 'button';
-    nein.className = 'lex-btn-reset';
+    nein.className = 'btn btn--l';
     nein.textContent = 'Hier bleiben';
     nein.onclick = verbergeWechsel;
     const jaB = document.createElement('button');
     jaB.type = 'button';
-    jaB.className = 'lex-btn-check';
+    jaB.className = 'btn btn--l btn--accent';
     jaB.textContent = jaText;
     jaB.onclick = () => { verbergeWechsel(); ja(); };
     k.append(nein, jaB);
@@ -201,7 +201,7 @@ export function render(container, config) {
     knoepfe.forEach((k) => {
       const b = document.createElement('button');
       b.type = 'button';
-      b.className = k.primaer ? 'lex-btn-check' : 'lex-btn-reset';
+      b.className = k.primaer ? 'btn btn--l btn--accent' : 'btn btn--l';
       b.textContent = k.text;
       b.onclick = k.onClick;
       leisteKnoepfe.appendChild(b);
@@ -256,15 +256,15 @@ export function render(container, config) {
             <textarea class="cw-eingabe" rows="9" maxlength="${maxZeichen}" spellcheck="false" autocapitalize="off" autocomplete="off"
               aria-label="Quellcode" placeholder="${esc(config.beispiel ?? '')}"></textarea>
             <div class="lex-result" hidden>
-              <button class="msg-x" type="button" aria-label="Meldung schließen">×</button>
+              <button class="btn-close msg-x" type="button" aria-label="Meldung schließen">×</button>
               <div class="lex-msg-text"></div>
             </div>
           </div>
         </div>
         <div class="cw-quelle-feld"></div>
         <div class="cw-quelle-knoepfe">
-          ${config.beispiel ? '<button class="lex-btn-reset cw-beispiel" type="button">Beispiel einfügen</button>' : ''}
-          <button class="lex-btn-check cw-weiter" type="button">Zur lexikalischen Analyse</button>
+          ${config.beispiel ? '<button class="btn btn--l cw-beispiel" type="button">Beispiel einfügen</button>' : ''}
+          <button class="btn btn--l btn--accent cw-weiter" type="button">Zur lexikalischen Analyse</button>
         </div>
       </div>
     `;

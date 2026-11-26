@@ -101,16 +101,16 @@ export function render(container, config) {
     <div class="pz-fest">
       <span class="pz-zaehler"></span>
       <div class="pz-stapel"></div>
-      <button type="button" class="lex-btn-reset cw-schritt-btn" hidden>Schritt vormachen</button>
-      <button type="button" class="lex-btn-reset cw-reset-btn">Zurücksetzen</button>
+      <button type="button" class="btn btn--s cw-schritt-btn" hidden>Schritt vormachen</button>
+      <button type="button" class="btn btn--s cw-reset-btn">Zurücksetzen</button>
     </div>
     <div class="pz-weg"></div>
     <div class="cw-leiste-anker">
       <div class="cw-leiste pz-leiste" hidden>
         <div class="cw-leiste-text"></div>
-        <button class="lex-btn-hinweis" type="button" hidden>Zeige Hinweis</button>
+        <button class="btn btn--s lex-btn-hinweis" type="button" hidden>Zeige Hinweis</button>
         <div class="lex-hinweis-text" hidden></div>
-        <button class="msg-x" type="button" aria-label="Meldung schließen">×</button>
+        <button class="btn-close msg-x" type="button" aria-label="Meldung schließen">×</button>
       </div>
     </div>
   `;

@@ -121,10 +121,8 @@ span.pb-tok-end { padding: 10px 0; }
 .pb-errzone-cw:hover:not(.off):not(.hot) { background: color-mix(in srgb, var(--fehler-knopf) 12%, transparent); }
 
 .pb-canvas { background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--r-l); padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-/* "Syntaxregeln" als Pop-up-Button über die volle Breite der Seitenleiste */
-.pb-btn-regeln { width: 100%; padding: 0.8125rem; border-radius: var(--r-m); background: var(--panel); border: 1px solid var(--border); color: var(--text); font: inherit; font-weight: 600; font-size: var(--fs-m); cursor: pointer; transition: .15s; }
-/* Hover wie bei .btn (Hilfe, nächste Lektion …) */
-.pb-btn-regeln:hover { background: var(--panel-2); border-color: var(--border-hover); }
+/* "Syntaxregeln"/"Semantikregeln" über die volle Breite der Seitenleiste */
+.pb-btn-regeln { width: 100%; --btn-bg: var(--panel); --btn-pad: var(--sp-12); }
 
 /* Meldung unter dem Baum: der Platz bleibt immer reserviert, damit nichts
    springt. Ohne Meldung ist die Fläche unsichtbar. Farben wie .lex-result. */

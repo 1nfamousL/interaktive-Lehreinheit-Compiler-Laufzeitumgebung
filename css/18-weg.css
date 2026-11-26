@@ -30,8 +30,6 @@
 /* Knöpfe der Quellcode-Phase: rechts neben dem Eingabefeld, ohne eigenes Fenster */
 .cw-quelle-knoepfe { width: 16.875rem; flex: none; display: flex; flex-direction: column; gap: 10px; }
 .cw-quelle-knoepfe button { flex: none; }
-.cw-beispiel { border-color: var(--text-dim); }
-.cw-beispiel:hover { background: color-mix(in srgb, var(--hover-ton) 8%, transparent); }
 
 /* Ergebnis der Phase mit den Knöpfen, wie es weitergeht. Klebt am unteren Rand der Folie
    (.slide scrollt) und liegt über dem Inhalt, deshalb ist der Hintergrund deckend. */
@@ -56,23 +54,24 @@
 /* Rechts in der Phasenleiste: "Phase lösen" (nur in 6.2, Phasen 2 bis 5), "Schritt vormachen"
    (nach falschen Zügen) und ganz rechts "Zurücksetzen" (Phasen 2 bis 6). Der erste sichtbare Knopf
    schiebt alle nach rechts, "Zurücksetzen" bleibt dadurch immer ganz rechts. */
-.cw-reset-btn, .cw-schritt-btn, .cw-loesen-btn { flex: none; margin-left: auto; padding: 0.375rem 0.875rem; font-size: var(--fs-l); font-weight: 500; }
+.cw-reset-btn, .cw-schritt-btn, .cw-loesen-btn { flex: none; margin-left: auto; }
 /* Zwischen den Knöpfen --gap-l: Die Zeile hat selbst 10px gap, der Rest kommt als Rand dazu */
 .cw-loesen-btn:not([hidden]) ~ .cw-schritt-btn, .cw-loesen-btn:not([hidden]) ~ .cw-reset-btn,
 .cw-schritt-btn:not([hidden]) ~ .cw-reset-btn { margin-left: calc(var(--gap-l) - 10px); }
-/* Hover wie bei .btn (Hilfe, nächste Lektion …): --panel aus .lex-btn-reset:hover wäre auf der Folie unsichtbar */
-.cw-reset-btn:hover, .cw-schritt-btn:hover, .cw-loesen-btn:hover { background: var(--panel-2); border-color: var(--border-hover); }
 .cw-leiste-text { flex: 1 1 16.25rem; }
 .cw-leiste-knoepfe { display: flex; gap: 10px; flex-wrap: wrap; }
-.cw-leiste-knoepfe button { flex: none; padding: 0.625rem 1.125rem; }
-.cw-leiste-knoepfe .lex-btn-reset { border-color: var(--text-dim); }
-.cw-leiste-knoepfe .lex-btn-reset:hover { background: color-mix(in srgb, var(--hover-ton) 8%, transparent); }
+.cw-leiste-knoepfe button { flex: none; --btn-pad: var(--sp-10) var(--sp-20); }
+/* Umriss-Knöpfe auf getöntem Grund: hellerer Rahmen, sonst verschwinden sie. .btn--accent bleibt unberührt */
+.cw-leiste-knoepfe, .cw-wechsel-knoepfe, .cw-beispiel {
+  --btn-border: var(--text-dim);
+  --btn-border-hover: var(--text-dim);
+  --btn-bg-hover: color-mix(in srgb, var(--hover-ton) 8%, transparent);
+}
 
 /* Phasen in der Kopfzeile sind anklickbar, aber nur bis zur weitesten erreichten Phase */
 .cw-app > .robot-ue-phases button.robot-ue-phase { font: inherit; font-weight: 500; font-size: var(--fs-l); cursor: pointer; border-radius: var(--r-l); }
-/* Text genau mittig: Die Textbox wird oben auf die Versalhöhe und unten auf die Grundlinie
-   zugeschnitten (wie .btn-label), der Innenabstand ist oben und unten gleich */
-.cw-app > .robot-ue-phases button.robot-ue-phase, .cw-reset-btn, .cw-schritt-btn, .cw-loesen-btn { text-box: trim-both cap alphabetic; padding: 0.625rem 0.875rem; }
+/* Text mittig (Textbox auf Versalhöhe), Werte wie .btn--s, damit Phasen und Knöpfe daneben gleich hoch sind */
+.cw-app > .robot-ue-phases button.robot-ue-phase { text-box: trim-both cap alphabetic; padding: var(--sp-10) var(--sp-12); }
 .cw-app > .robot-ue-phases button.robot-ue-phase:not(.active) { background: transparent; }
 .cw-app > .robot-ue-phases button.robot-ue-phase:not(.active):not(:disabled):hover { color: var(--text); border-color: var(--text-dim); }
 .cw-app > .robot-ue-phases button.robot-ue-phase:disabled { cursor: default; opacity: .55; }
@@ -115,8 +114,5 @@
 .rueckfrage .cw-wechsel-knoepfe { display: grid; grid-template-columns: 1fr 1fr; }
 .cw-wechsel-text { font-size: var(--fs-l); line-height: 1.4; }
 .cw-wechsel-knoepfe { display: flex; gap: 10px; white-space: nowrap; }
-.cw-wechsel-knoepfe button { flex: none; padding: 0.5rem 1rem; }
-/* Hellerer Rahmen, sonst verschwindet "Hier bleiben" auf dem getönten Grund (wie in der Ergebnisleiste) */
-.cw-wechsel-knoepfe .lex-btn-reset { border-color: var(--text-dim); }
-.cw-wechsel-knoepfe .lex-btn-reset:hover { background: color-mix(in srgb, var(--hover-ton) 8%, transparent); }
+.cw-wechsel-knoepfe button { flex: none; --btn-pad: var(--sp-8) var(--sp-16); }
 

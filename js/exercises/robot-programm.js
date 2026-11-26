@@ -219,11 +219,11 @@ export function renderRobotProgramm(container, { mitSchritten = false, hindernis
   const actionsEl = document.createElement('div');
   actionsEl.className = 'robot-actions';
   const resetBtn = document.createElement('button');
-  resetBtn.className = 'robot-btn-reset';
+  resetBtn.className = 'btn btn--l btn--fill';
   resetBtn.textContent = 'Zurücksetzen';
   resetBtn.onclick = reset;
   const runBtn = document.createElement('button');
-  runBtn.className = 'robot-check-btn';
+  runBtn.className = 'btn btn--l btn--accent';
   runBtn.textContent = 'Start';
   runBtn.onclick = run;
   actionsEl.appendChild(resetBtn);

@@ -34,8 +34,6 @@
 }
 /* Titel aller Pop-ups: 20px, bewusst außerhalb der Schriftskala */
 .modal-head h3 { margin: 0; font-size: 1.25rem; font-weight: 600; }
-.modal-close { position: relative; flex: none; width: 1.75rem; height: 1.75rem; padding: 0; border: none; border-radius: var(--r-s); background: transparent; color: var(--text-dim); cursor: pointer; transition: .15s; }
-.modal-close:hover { background: color-mix(in srgb, var(--hover-ton) 10%, transparent); color: var(--text); }
 .modal-body { padding: 22px 20px; min-height: 0; overflow-y: auto; }
 .modal-head { flex: none; }
 .modal-text p { margin: 0 0 10px; font-size: var(--fs-l); line-height: 1.6; color: var(--text); }
@@ -89,7 +87,7 @@
 .hilfe-zeile { display: grid; grid-template-columns: 10.625rem 1fr; gap: var(--gap-l); align-items: center; }
 .hilfe-knoepfe { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 /* Mini-Knopf: nur Abbildung, gleiche Farbrollen wie die echten Knöpfe im Menü
-   (.secondary, .primary, .menu-btn-akzent, .icon-btn), aber kleiner und nicht klickbar */
+   (.btn--fill, .btn--primary, .btn--accent, .btn--icon-only), aber kleiner und nicht klickbar */
 .mini-knopf {
   display: inline-flex; align-items: center; justify-content: center;
   padding: 0.25rem 0.625rem; border-radius: var(--r-s);
@@ -243,14 +241,3 @@
 .mini-karte { display: block; width: 2.125rem; height: 1.5rem; border: 2px solid var(--border); border-radius: var(--r-s); background: var(--panel); }
 .mini-balken { display: block; width: 6.25rem; height: 0.375rem; border-radius: 999px; background: var(--fortschritt-spur); overflow: hidden; }
 .mini-balken > span { display: block; width: 40%; height: 100%; border-radius: 999px; background: var(--fortschritt); }
-
-/* Schließen-Symbol in Meldungen und Pop-up-Fenstern: assets/x.svg (Feather „x“) als Maske in der
-   Textfarbe des Knopfs (wie die Symbole in Rückmeldungen), damit es genau mittig sitzt (das Zeichen
-   „×“ liegt je nach Schrift etwas zu tief). Das Zeichen bleibt im HTML, wird aber ausgeblendet
-   (font-size: 0), vorgelesen wird das aria-label des Knopfs. */
-.msg-x, .modal-close { font-size: 0; }
-.msg-x::before, .modal-close::before {
-  content: ""; position: absolute; left: 50%; top: 50%; width: 1rem; height: 1rem;
-  transform: translate(-50%, -50%);
-  background-color: currentColor; mask: url("../assets/x.svg") no-repeat center / contain;
-}
