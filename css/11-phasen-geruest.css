@@ -42,7 +42,6 @@
 
 /* Pfeil zwischen den Phasen in der Phasenanzeige */
 .cw-app > .robot-ue-phases .robot-ue-phase-sep { font-size: 1.5625rem; line-height: 1; }
-.cg-source-empty { color: var(--papier-dim); font-size: var(--fs-s); line-height: 1.5; }
 .cg-source-code { margin: 0; font: inherit; font-size: var(--fs-l); line-height: 1.6; white-space: pre-wrap; }
 /* Überschriften in Karten (Datenspeicher, Register, Flag, Rechenwerk): normale Schreibweise, fett, so groß wie "Befehle" */
 .cg-sub { font-size: var(--fs-l); letter-spacing: .2px; color: var(--text-dim); font-weight: 600; margin: 16px 2px 8px; }
@@ -162,10 +161,6 @@
    robot-movable/robot-dragging, siehe Roboter-Styles oben). */
 
 /* Bedienelemente im platzierten Baustein, angelehnt an .robot-mem-ref */
-.cg-opc { display: inline-flex; align-items: center; gap: 6px; }
-.cg-seg { display: inline-flex; border-radius: var(--r-s); overflow: hidden; background: color-mix(in srgb, var(--aufhellung) 55%, transparent); }
-.cg-seg button { border: none; background: transparent; font: inherit; font-size: var(--fs-s); font-weight: 700; padding: 0.25rem 0.5rem; cursor: pointer; color: var(--text-auf-farbe); }
-.cg-seg button.on { background: var(--text-auf-farbe); color: var(--weiss); }
 .cg-field { font: inherit; font-size: var(--fs-m); font-weight: 700; color: var(--text-auf-farbe); background: color-mix(in srgb, var(--aufhellung) 55%, transparent); border: none; border-radius: var(--r-s); padding: 4px 6px; cursor: pointer; }
 input.cg-field { width: 4rem; cursor: text; }
 .cg-field.cg-sel-mem { background: var(--feld-speicher); }

@@ -1,24 +1,34 @@
-/* stylesheet: nur die reihenfolge der teile, der inhalt steht in css/ */
-@import "css/01-grundlagen.css";
-@import "css/02-basis.css";
-@import "css/03-menue.css";
-@import "css/04-kapitel-kopf.css";
-@import "css/05-mindmap.css";
-@import "css/06-kapitel-liste.css";
-@import "css/07-lektion.css";
-@import "css/08-abbildungen.css";
-@import "css/10-roboter.css";
-@import "css/11-phasen-geruest.css";
-@import "css/12-laufzeit.css";
-@import "css/13-drag-drop.css";
-@import "css/14-zuordnung.css";
-@import "css/15-lexik.css";
-@import "css/16-syntax.css";
-@import "css/17-semantik.css";
-@import "css/18-weg.css";
+/* ---- grundlagen---- */
+@import "css/01-grundlagen.css";            /* farben, schriftgrößen, abstände */
+@import "css/02-basis.css";                 /* zurücksetzen, basis-schriftgröße, mindestbreite */
+
+/* ---- screens ---- */
+@import "css/03-menue.css";                 /* hauptmenü */
+@import "css/04-kapitel-kopf.css";          /* kapitelübersicht: kopfzeile */
+@import "css/05-mindmap.css";               /* kapitelübersicht: mindmap */
+@import "css/06-kapitel-liste.css";         /* kapitelübersicht: liste */
+@import "css/07-lektion.css";               /* lektion: folie und navigation darunter */
+@import "css/08-abbildungen.css";           /* abbildungen und karten in textfolien */
+
+/* ---- übungen ---- */
+@import "css/10-roboter.css";               /* roboter-programmierung (1.1), grundlage der roboterkarten */
+@import "css/11-phasen-geruest.css";        /* phasenübungen: gemeinsames gerüst und codegenerierung */
+@import "css/12-laufzeit.css";              /* laufzeit mit fächern */
+@import "css/13-drag-drop.css";             /* drag-and-drop-diagramm (1.3) */
+@import "css/14-zuordnung.css";             /* phasen-zuordnung (quiz) */
+@import "css/15-lexik.css";                 /* lexik */
+@import "css/16-syntax.css";                /* syntax */
+@import "css/17-semantik.css";              /* semantik */
+@import "css/18-weg.css";                   /* der gesamte weg*/
+
+/* ---- pop-ups ---- */
 @import "css/20-popups.css";
-@import "css/30-feinabstimmung.css";
-@import "css/31-symbole.css";
-@import "css/32-bewegung-fokus.css";
-@import "css/33-einstellungen.css";
+
+/* ---- übergreifendes, überschreibt früheres ---- */
+@import "css/30-feinabstimmung.css";        /* feinabstimmung der phasenübungen (kapitel 2 bis 6) */
+@import "css/31-symbole.css";               /* symbole in rückmeldungen */
+@import "css/32-bewegung-fokus.css";        /* übergänge, tastaturfokus, reduzierte bewegung */
+@import "css/33-einstellungen.css";         /* einstellungs-pop-up (gehört inhaltlich zu 20, steht hier wegen der reihenfolge) */
+
+/* ---- farbschema ---- */
 @import "css/99-helles-schema.css";
